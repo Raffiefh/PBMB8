@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
+import 'sign_in.dart';
 import 'base.dart';
 
 class Screen extends StatefulWidget {
@@ -21,7 +21,7 @@ class _ScreenState extends State<Screen> {
   void _goToLogin() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      MaterialPageRoute(builder: (_) => const sign_in()),
     );
   }
 
@@ -33,16 +33,16 @@ class _ScreenState extends State<Screen> {
     child: Align(
       alignment: Alignment.topCenter,
       child: Padding(
-        padding: EdgeInsets.only(top: size.height * 0.037),
+        padding: EdgeInsets.only(top: size.height * 0.08),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
               'assets/EHO.png',
-              width: size.width * 0.4,
-              height: size.height * 0.55,
+              width: size.width * 0.45,
+              height: size.height * 0.45,
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 100),
             ElevatedButton(
               onPressed: _goToLogin,
               style: ElevatedButton.styleFrom(
@@ -50,7 +50,7 @@ class _ScreenState extends State<Screen> {
                 foregroundColor: const Color.fromARGB(255, 12, 142, 218),
                 padding: EdgeInsets.symmetric(
                   horizontal: size.width * 0.08,
-                  vertical: size.height * 0.025,
+                  vertical: size.height * 0.015,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -61,7 +61,7 @@ class _ScreenState extends State<Screen> {
               child: Text(
                 'Get Started',
                 style: TextStyle(
-                  fontSize: size.width * 0.03,
+                  fontSize: size.width * 0.04,
                   fontFamily: 'Outfit',
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.0,

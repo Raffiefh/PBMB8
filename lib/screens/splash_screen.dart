@@ -84,17 +84,16 @@ class _SplashscreenState extends State<SplashScreen> with TickerProviderStateMix
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                       Transform.translate(
-                        offset: Offset(0, -size.height * 0.05),
+                        offset: Offset(0, -size.height * 0.035),
                         child: FadeTransition(
                           opacity: _imageOpacity,
                           child: Image.asset(
                             'assets/EHO.png',
                             width: size.width * 0.5,
-                            height: size.height * 0.3,
+                            height: size.height * 0.4,
                           ),
                         ),
                       ),
-                      SizedBox(height: size.height * 0.15), 
                       SlideTransition(
                         position: _textSlide,
                         child: FadeTransition(
@@ -107,21 +106,22 @@ class _SplashscreenState extends State<SplashScreen> with TickerProviderStateMix
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: size.width * 0.06,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(255, 206, 238, 255),
+                                  fontFamily: 'Poppins', 
+                                  fontWeight: FontWeight.w700, 
+                                  color: const Color.fromARGB(255, 226, 243, 252),
                                   letterSpacing: 1.8,
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 4),
                               SizedBox(
                                 width: size.width * 0.8,
                                 child: Text(
-                                  'EHO Horenya Bareng!Horenya Event! Gaspol Terus!',
+                                  'EHO HORENYA BARENG ! HORENYA EVENT !\n GASPOL TERUS !!!',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: size.width * 0.03,
-                                    color: const Color.fromARGB(255, 206, 238, 255),
-                                    height: 1.2,
+                                    fontSize: size.width * 0.031,
+                                    color: const Color.fromARGB(255, 226, 243, 252),
+                                    height: 1.35,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
