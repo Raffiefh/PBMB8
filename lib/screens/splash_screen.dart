@@ -122,6 +122,7 @@ class _SplashscreenState extends State<SplashScreen> with TickerProviderStateMix
                                     fontSize: size.width * 0.031,
                                     color: const Color.fromARGB(255, 226, 243, 252),
                                     height: 1.35,
+                                    fontFamily: 'Poppins',
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),

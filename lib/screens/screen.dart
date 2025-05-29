@@ -62,7 +62,7 @@ class _ScreenState extends State<Screen> {
                 'Get Started',
                 style: TextStyle(
                   fontSize: size.width * 0.04,
-                  fontFamily: 'Outfit',
+                  fontFamily: 'Poppins',
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.0,
                 ),

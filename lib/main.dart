@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pbmuas/screens/splash_screen.dart';
-import 'screens/screen.dart';
-import 'screens/sign_in.dart';
+import 'package:pbmuas/view/homepage_user.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Arial',
         primarySwatch: Colors.blue,
       ),
-      home: const SplashScreen(),
+      home: const   SplashScreen(),
     );
   }
 }
