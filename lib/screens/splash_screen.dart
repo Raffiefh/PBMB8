@@ -2,6 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'screen.dart';
 import 'base.dart';
+import 'package:pbmuas/screens/sign_in.dart';
+import 'package:pbmuas/helpers/session_helper.dart';
+import 'package:pbmuas/screens/widgets/panitia_navbar.dart';
+import 'package:pbmuas/screens/widgets/peserta_navbar .dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,7 +14,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashscreenState();
 }
 
-class _SplashscreenState extends State<SplashScreen> with TickerProviderStateMixin {
+class _SplashscreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
   late AnimationController _imageController;
   late AnimationController _textController;
   late Animation<double> _imageOpacity;
@@ -33,17 +38,20 @@ class _SplashscreenState extends State<SplashScreen> with TickerProviderStateMix
       duration: const Duration(milliseconds: 1500),
     );
 
-    _imageOpacity = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _imageController, curve: Curves.easeIn),
-    );
+    _imageOpacity = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _imageController, curve: Curves.easeIn));
 
-    _textSlide = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeOut),
-    );
+    _textSlide = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeOut));
 
-    _textOpacity = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeIn),
-    );
+    _textOpacity = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeIn));
 
     _imageController.forward().whenComplete(() => _textController.forward());
 
@@ -51,14 +59,39 @@ class _SplashscreenState extends State<SplashScreen> with TickerProviderStateMix
   }
 
   void _startDelay() {
-    _timer = Timer(const Duration(seconds: 10), _goToScreen);
+    _timer = Timer(const Duration(seconds: 5), _goToScreen);
   }
 
-  void _goToScreen() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const Screen()),
-    );
+  void _goToScreen() async {
+    final cekLogin = await SessionHelper.isLoggedIn();
+    final akun = cekLogin ? await SessionHelper.getUser() : null;
+
+    if (akun == null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const sign_in()),
+      );
+    } else {
+      switch (akun.roleAkunId) {
+        case 1:
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const NavbarPanitia()),
+          );
+          break;
+        case 2:
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const NavbarPeserta()),
+          );
+          break;
+        default:
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const sign_in()),
+          );
+      }
+    }
   }
 
   @override
@@ -83,54 +116,54 @@ class _SplashscreenState extends State<SplashScreen> with TickerProviderStateMix
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                      Transform.translate(
-                        offset: Offset(0, -size.height * 0.035),
-                        child: FadeTransition(
-                          opacity: _imageOpacity,
-                          child: Image.asset(
-                            'assets/EHO.png',
-                            width: size.width * 0.5,
-                            height: size.height * 0.4,
+                Transform.translate(
+                  offset: Offset(0, -size.height * 0.035),
+                  child: FadeTransition(
+                    opacity: _imageOpacity,
+                    child: Image.asset(
+                      'assets/EHO.png',
+                      width: size.width * 0.5,
+                      height: size.height * 0.4,
+                    ),
+                  ),
+                ),
+                SlideTransition(
+                  position: _textSlide,
+                  child: FadeTransition(
+                    opacity: _textOpacity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'WELCOME IN EHO',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: size.width * 0.06,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w700,
+                            color: const Color.fromARGB(255, 226, 243, 252),
+                            letterSpacing: 1.8,
                           ),
                         ),
-                      ),
-                      SlideTransition(
-                        position: _textSlide,
-                        child: FadeTransition(
-                          opacity: _textOpacity,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'WELCOME IN EHO',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: size.width * 0.06,
-                                  fontFamily: 'Poppins', 
-                                  fontWeight: FontWeight.w700, 
-                                  color: const Color.fromARGB(255, 226, 243, 252),
-                                  letterSpacing: 1.8,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              SizedBox(
-                                width: size.width * 0.8,
-                                child: Text(
-                                  'EHO HORENYA BARENG ! HORENYA EVENT !\n GASPOL TERUS !!!',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: size.width * 0.031,
-                                    color: const Color.fromARGB(255, 226, 243, 252),
-                                    height: 1.35,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
+                        const SizedBox(height: 4),
+                        SizedBox(
+                          width: size.width * 0.8,
+                          child: Text(
+                            'EHO HORENYA BARENG ! HORENYA EVENT !\n GASPOL TERUS !!!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: size.width * 0.031,
+                              color: const Color.fromARGB(255, 226, 243, 252),
+                              height: 1.35,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
