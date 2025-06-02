@@ -43,6 +43,11 @@ dependencies:
   jwt_decode: ^0.3.1
   device_preview: ^1.2.0
   supabase_flutter: ^1.10.19
+  flutter_map: ^8.1.1
+  latlong2: ^0.9.1
+  geolocator: ^14.0.1
+  image_picker: ^1.1.2
+
 
 dependency_overrides:
   sign_in_with_apple: ^7.0.1
