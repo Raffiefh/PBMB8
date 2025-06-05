@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Arial',
         primarySwatch: Colors.blue,
       ),
-      home: const NavbarPeserta(),
+      home: const NavbarPanitia(),
     );
   }
 }
