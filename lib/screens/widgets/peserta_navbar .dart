@@ -38,72 +38,38 @@ class _NavbarPesertaState extends State<NavbarPeserta> {
   }
 
   @override
-   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final navHeight = size.height * 0.1;
-    final iconSize = size.width * 0.08;
-
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          Positioned.fill(child: _pages[_selectedIndex]),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              height: navHeight,
-              padding: EdgeInsets.only(top: navHeight * 0.1),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: Color.fromARGB(255, 155, 201, 238))),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _navItem(Icons.home, "Beranda", 0, iconSize),
-                  _navItem(Icons.forum, "Forum", 1, iconSize),
-                  _navItem(Icons.confirmation_num, "Tiketku", 2, iconSize),
-                  _navItem(Icons.account_circle, "Akun", 3, iconSize),
-                ],
-              ),
-            ),
-          ),
-        ],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: _pages[_selectedIndex],
       ),
-    );
-  }
-
-  Widget _navItem(IconData icon, String label, int index, double iconSize) {
-    final isSelected = _selectedIndex == index;
-
-    return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: isSelected ? iconSize * 1.35 : iconSize,
-            color: isSelected ? Colors.blue : Colors.grey[400],
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.black,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Beranda',
           ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: iconSize * 0.42,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? Colors.blue : Colors.grey[400],
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.forum),
+            label: 'Forum',
           ),
-          const SizedBox(height: 1),
-          if (isSelected)
-            Container(
-              height: 3,
-              width: 30,
-              color: Colors.blue,
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.confirmation_num),
+            label: 'Tiket',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Akun',
+          ),
         ],
       ),
     );
