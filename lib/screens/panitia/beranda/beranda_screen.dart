@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pbmuas/screens/panitia/beranda/tambah_event_screen.dart';
 
 class HomePanitiaPage extends StatefulWidget {
   const HomePanitiaPage({super.key});
@@ -8,23 +9,39 @@ class HomePanitiaPage extends StatefulWidget {
 }
 
 class _HomePanitiaPageState extends State<HomePanitiaPage> {
-  bool showForm = false;
 
-  final _formKey = GlobalKey<FormState>();
-  final _judulController = TextEditingController();
-  final _deskripsiController = TextEditingController();
-  final _tanggalController = TextEditingController();
-  final _jamController = TextEditingController();
-  final _hargaController = TextEditingController();
-  final _tipeTiketController = TextEditingController();
-  final _lokasiController = TextEditingController();
-  final _kuotaController = TextEditingController();
-  final _gambarController = TextEditingController();
+  // Dummy data event (nanti bisa diganti dengan data dari API)
+  final List<Map<String, String>> events = [
+    {
+      'id': '1',
+      'title': 'Konser Sound Horeg',
+      'description': 'Konser musik akbar di Jember!',
+      'date': '12 Juni 2025',
+      'time': '18:00',
+      'location': 'GOR Jember',
+      'ticket_type': 'Gratis',
+      'price': '0',
+      'image': 'https://images.unsplash.com/photo-1503428593586-e225b39bddfe'
+    },
+    {
+      'id': '2',
+      'title': 'Seminar Kewirausahaan',
+      'description': 'Belajar bisnis dari para praktisi',
+      'date': '15 Juli 2025',
+      'time': '09:00',
+      'location': 'Aula Universitas',
+      'ticket_type': 'Berbayar',
+      'price': '50.000',
+      'image': 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407'
+    },
+  ];
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFDAEAF1), // Telur asin muda
+      backgroundColor: const Color(0xFFDAEAF1),
+
       appBar: AppBar(
         title: const Text('Beranda Panitia'),
         backgroundColor: Colors.blue.shade700,
@@ -35,32 +52,32 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
           children: [
             Row(
               children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => setState(() => showForm = false),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Lihat Event'),
+                const Text('Daftar Event', style: TextStyle(fontSize: 20)),
+                const Spacer(),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navigasi ke halaman tambah event
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CreateEventScreen(),
+                      ),
+                    ).then((_) {
+                      // Refresh data ketika kembali dari tambah event
+                      setState(() {});
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lightBlue,
+                    foregroundColor: Colors.white,
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => setState(() => showForm = true),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlue,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Buat Event'),
-                  ),
+                  child: const Text('Buat Event'),
                 ),
               ],
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: showForm ? _buildEventForm() : _buildEventListDummy(),
+              child: _buildEventList(),
             ),
           ],
         ),
@@ -68,100 +85,12 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
     );
   }
 
-  Widget _buildEventForm() {
-    return SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            _buildInputField('Judul Event', _judulController),
-            _buildInputField('Deskripsi', _deskripsiController),
-            _buildInputField('Tanggal', _tanggalController),
-            _buildInputField('Jam', _jamController),
-            _buildInputField('Harga', _hargaController),
-            _buildInputField('Jenis Tiket', _tipeTiketController),
-            _buildInputField('Lokasi', _lokasiController),
-            _buildInputField('Jumlah Tiket', _kuotaController),
-            _buildInputField('URL Gambar', _gambarController),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Event anda berhasil dibuat'),
-                      backgroundColor: Colors.blue,
-                    ),
-                  );
-                  setState(() {
-                    showForm = false;
-                    _judulController.clear();
-                    _deskripsiController.clear();
-                    _tanggalController.clear();
-                    _jamController.clear();
-                    _hargaController.clear();
-                    _tipeTiketController.clear();
-                    _lokasiController.clear();
-                    _kuotaController.clear();
-                    _gambarController.clear();
-                  });
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Buat'),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInputField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(color: Colors.blue),
-          border: OutlineInputBorder(
-            borderSide: const BorderSide(color: Colors.blue),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: Colors.blue, width: 2),
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Field tidak boleh kosong';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
-  Widget _buildEventListDummy() {
-    final events = [
-      {
-        'title': 'Konser Sound Horeg',
-        'description': 'Konser musik akbar di Jember!',
-        'date': '12 Juni 2025',
-        'time': '18:00',
-        'location': 'GOR Jember',
-        'ticket_type': 'Gratis',
-        'price': '0',
-        'image':
-            'https://images.unsplash.com/photo-1503428593586-e225b39bddfe'
+  Widget _buildEventList() {
+    return ListView.builder(
+      itemCount: events.length,
+      itemBuilder: (context, index) {
+        return _buildEventCard(events[index]);
       },
-    ];
-    return ListView(
-      children: events.map(_buildEventCard).toList(),
     );
   }
 
@@ -173,9 +102,9 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Bagian gambar event
           ClipRRect(
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(16)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: Image.network(
               event['image']!,
               height: 180,
@@ -187,6 +116,8 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
               ),
             ),
           ),
+          
+          // Bagian info event
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Column(
@@ -218,6 +149,39 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
                 ),
               ],
             ),
+          ),
+          
+          // Bagian action buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // Button Detail
+                IconButton(
+                  icon: const Icon(Icons.visibility, color: Colors.blue),
+                  onPressed: () {
+                    _navigateToDetail(event);
+                  },
+                ),
+                
+                // Button Edit
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.green),
+                  onPressed: () {
+                    _navigateToEdit(event);
+                  },
+                ),
+                
+                // Button Delete
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    _showDeleteConfirmation(event['id']!);
+                  },
+                ),
+              ],
+            ),
           )
         ],
       ),
@@ -235,6 +199,140 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
           style: const TextStyle(fontSize: 13, color: Colors.black87),
         ),
       ],
+    );
+  }
+
+  void _navigateToDetail(Map<String, String> event) {
+    // Navigasi ke halaman detail event
+    // Buat file baru untuk DetailEventScreen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(title: Text(event['title']!)),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.network(
+                  event['image']!,
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  event['title']!,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  event['description']!,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+                _buildDetailItem(Icons.date_range, 'Tanggal', event['date']!),
+                _buildDetailItem(Icons.access_time, 'Waktu', event['time']!),
+                _buildDetailItem(Icons.location_on, 'Lokasi', event['location']!),
+                _buildDetailItem(Icons.confirmation_num, 'Tiket', 
+                  '${event['ticket_type']} - ${event['price']}'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailItem(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 24, color: Colors.blue),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToEdit(Map<String, String> event) {
+    // Navigasi ke halaman edit event
+    // Asumsi TambahEventScreen bisa menerima parameter untuk mode edit
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateEventScreen()
+      ),
+    ).then((_) {
+      // Refresh data ketika kembali dari edit event
+      setState(() {});
+    });
+  }
+
+  void _showDeleteConfirmation(String eventId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Hapus Event'),
+          content: const Text('Apakah Anda yakin ingin menghapus event ini?'),
+          actions: [
+            TextButton(
+              child: const Text('Batal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                _deleteEvent(eventId);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteEvent(String eventId) {
+    // Hapus event dari list
+    setState(() {
+      events.removeWhere((event) => event['id'] == eventId);
+    });
+    
+    // Tampilkan snackbar konfirmasi
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Event berhasil dihapus'),
+        duration: Duration(seconds: 2),
+      ),
     );
   }
 }

@@ -25,6 +25,7 @@ class _NavbarPanitiaState extends State<NavbarPanitia> {
   }
 
   final List<Widget> _pages = [
+    // const BerandaContent(),
     const HomePanitiaPage(),
     const ForumContent(),
     const RiwayatContent(),
