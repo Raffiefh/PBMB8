@@ -9,6 +9,7 @@ class HomePanitiaPage extends StatefulWidget {
 }
 
 class _HomePanitiaPageState extends State<HomePanitiaPage> {
+
   // Dummy data event (nanti bisa diganti dengan data dari API)
   final List<Map<String, String>> events = [
     {
@@ -35,10 +36,12 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
     },
   ];
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFDAEAF1),
+
       appBar: AppBar(
         title: const Text('Beranda Panitia'),
         backgroundColor: Colors.blue.shade700,
