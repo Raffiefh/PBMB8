@@ -13,6 +13,7 @@ import 'screens/sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 
+
 // void main() {
 //   runApp(const MyApp());
 // }
@@ -48,15 +49,11 @@ void main() async {
             providers: [
               ChangeNotifierProvider(create: (_) => AuthVModel()),
               ChangeNotifierProvider(create: (_) => ForumVModel()),
-              ChangeNotifierProvider(create: (_) => EventVModel()),
               ],
             child: MyApp(),
           ),
     ),
   );
-
-void main() {
-  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -65,13 +62,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'EHO : Event Horeg Application',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Arial',
-        primarySwatch: Colors.blue,
-      ),
-      home: const NavbarPanitia(),
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
+      home: const SplashScreen(),
+      routes: {
+        '/login': (context) => const sign_in(),
+        '/panitia': (context) => const NavbarPanitia(),
+        '/peserta': (context) => const NavbarPeserta(),
+      },
     );
   }
 }

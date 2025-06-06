@@ -62,7 +62,7 @@ class _NavbarPesertaState extends State<NavbarPeserta> {
             icon: Icon(Icons.forum),
             label: 'Forum',
           ),
-          BottomNavigationBarItem
+          BottomNavigationBarItem(
             icon: Icon(Icons.confirmation_num),
             label: 'Tiket',
           ),
