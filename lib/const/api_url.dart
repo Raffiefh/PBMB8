@@ -1,2 +1,2 @@
-// final String baseUlr = 'http://127.0.0.1:8000/api';
-final String baseUlr = 'https://a719-103-160-182-7.ngrok-free.app/api';
+// final String baseUlr = 'https://8510-120-188-74-198.ngrok-free.app/api';
+final String baseUlr = 'https://api-sound-horeq.vercel.app/api';

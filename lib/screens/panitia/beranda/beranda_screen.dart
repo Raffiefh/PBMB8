@@ -1,177 +1,334 @@
 import 'package:flutter/material.dart';
 import 'package:pbmuas/screens/panitia/beranda/tambah_event_screen.dart';
-class Event {
-  final String id;
-  final String nama;
-  final String lokasi;
-  final DateTime tanggal;
-  final String gambarUrl;
 
-  Event({
-    required this.id,
-    required this.nama,
-    required this.lokasi,
-    required this.tanggal,
-    required this.gambarUrl,
-  });
+class HomePanitiaPage extends StatefulWidget {
+  const HomePanitiaPage({super.key});
+
+  @override
+  State<HomePanitiaPage> createState() => _HomePanitiaPageState();
 }
 
-class BerandaContent extends StatelessWidget {
-  const BerandaContent({super.key});
-
-  // Dummy event list
-  List<Event> _dummyEvents() {
-    return [
-      Event(
-        id: '1',
-        nama: 'Sound Horeq Festival 2025',
-        lokasi: 'Lapangan Jember',
-        tanggal: DateTime(2025, 7, 15),
-        gambarUrl:
-            'https://magicspecialevents.com/event-rentals/wp-content/uploads/Welcome-Sign-Banner-Magic-Special-Events-2-1.jpg',
-      ),
-      Event(
-        id: '2',
-        nama: 'Horeq Musik Indie',
-        lokasi: 'Alun-alun Kota',
-        tanggal: DateTime(2025, 8, 10),
-        gambarUrl:
-            'https://images.unsplash.com/photo-1497032205916-ac775f0649ae?auto=format&fit=crop&w=800&q=60',
-      ),
-    ];
-  }
-
- void _onTambahEvent(BuildContext context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const CreateEventScreen(),
-    ),
-  );
-}
-
-
-  void _onDetail(BuildContext context, Event event) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Detail: ${event.nama}")),
-    );
-  }
-
-  void _onEdit(BuildContext context, Event event) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Edit: ${event.nama}")),
-    );
-  }
-
-  void _onDelete(BuildContext context, Event event) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Hapus Event"),
-        content: Text("Yakin ingin menghapus '${event.nama}'?"),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text("Batal")),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Event '${event.nama}' dihapus")),
-              );
-            },
-            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
+class _HomePanitiaPageState extends State<HomePanitiaPage> {
+  // Dummy data event (nanti bisa diganti dengan data dari API)
+  final List<Map<String, String>> events = [
+    {
+      'id': '1',
+      'title': 'Konser Sound Horeg',
+      'description': 'Konser musik akbar di Jember!',
+      'date': '12 Juni 2025',
+      'time': '18:00',
+      'location': 'GOR Jember',
+      'ticket_type': 'Gratis',
+      'price': '0',
+      'image': 'https://images.unsplash.com/photo-1503428593586-e225b39bddfe'
+    },
+    {
+      'id': '2',
+      'title': 'Seminar Kewirausahaan',
+      'description': 'Belajar bisnis dari para praktisi',
+      'date': '15 Juli 2025',
+      'time': '09:00',
+      'location': 'Aula Universitas',
+      'ticket_type': 'Berbayar',
+      'price': '50.000',
+      'image': 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407'
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final events = _dummyEvents();
+    return Scaffold(
+      backgroundColor: const Color(0xFFDAEAF1),
+      appBar: AppBar(
+        title: const Text('Beranda Panitia'),
+        backgroundColor: Colors.blue.shade700,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Text('Daftar Event', style: TextStyle(fontSize: 20)),
+                const Spacer(),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navigasi ke halaman tambah event
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CreateEventScreen(),
+                      ),
+                    ).then((_) {
+                      // Refresh data ketika kembali dari tambah event
+                      setState(() {});
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lightBlue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Buat Event'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: _buildEventList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+  Widget _buildEventList() {
+    return ListView.builder(
+      itemCount: events.length,
+      itemBuilder: (context, index) {
+        return _buildEventCard(events[index]);
+      },
+    );
+  }
+
+  Widget _buildEventCard(Map<String, String> event) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-           const SizedBox(height: 30),
-          Row(
-            children: [
-              const Text(
-                "Event Anda",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          // Bagian gambar event
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            child: Image.network(
+              event['image']!,
+              height: 180,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                height: 180,
+                color: Colors.grey.shade300,
+                child: const Icon(Icons.broken_image, size: 48),
               ),
-              const Spacer(),
-              ElevatedButton.icon(
-                onPressed: () => _onTambahEvent(context),
-                icon: const Icon(Icons.add),
-                label: const Text("Tambah Event"),
+            ),
+          ),
+          
+          // Bagian info event
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  event['title']!,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  event['description']!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 6,
+                  children: [
+                    _iconText(Icons.date_range, event['date']!),
+                    _iconText(Icons.access_time, event['time']!),
+                    _iconText(Icons.location_on, event['location']!),
+                    _iconText(Icons.confirmation_num,
+                        '${event['ticket_type']} - ${event['price']}'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          // Bagian action buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // Button Detail
+                IconButton(
+                  icon: const Icon(Icons.visibility, color: Colors.blue),
+                  onPressed: () {
+                    _navigateToDetail(event);
+                  },
+                ),
+                
+                // Button Edit
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.green),
+                  onPressed: () {
+                    _navigateToEdit(event);
+                  },
+                ),
+                
+                // Button Delete
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    _showDeleteConfirmation(event['id']!);
+                  },
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _iconText(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: Colors.blue),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: const TextStyle(fontSize: 13, color: Colors.black87),
+        ),
+      ],
+    );
+  }
+
+  void _navigateToDetail(Map<String, String> event) {
+    // Navigasi ke halaman detail event
+    // Buat file baru untuk DetailEventScreen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(title: Text(event['title']!)),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.network(
+                  event['image']!,
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  event['title']!,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  event['description']!,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+                _buildDetailItem(Icons.date_range, 'Tanggal', event['date']!),
+                _buildDetailItem(Icons.access_time, 'Waktu', event['time']!),
+                _buildDetailItem(Icons.location_on, 'Lokasi', event['location']!),
+                _buildDetailItem(Icons.confirmation_num, 'Tiket', 
+                  '${event['ticket_type']} - ${event['price']}'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailItem(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 24, color: Colors.blue),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: events.isEmpty
-                ? const Center(child: Text("Belum ada event yang dibuat."))
-                : ListView.builder(
-                    itemCount: events.length,
-                    itemBuilder: (context, index) {
-                      final event = events[index];
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 4,
-                        clipBehavior: Clip.antiAlias,
-                        child: Column(
-                          children: [
-                            Image.network(
-                              event.gambarUrl,
-                              height: 160,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    event.nama,
-                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text("📍 ${event.lokasi}"),
-                                  Text("📅 ${event.tanggal.toLocal().toString().split(' ')[0]}"),
-                                  const SizedBox(height: 12),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () => _onDetail(context, event),
-                                        child: const Text("Detail"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => _onEdit(context, event),
-                                        child: const Text("Edit"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => _onDelete(context, event),
-                                        child: const Text(
-                                          "Hapus",
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ),
         ],
+      ),
+    );
+  }
+
+  void _navigateToEdit(Map<String, String> event) {
+    // Navigasi ke halaman edit event
+    // Asumsi TambahEventScreen bisa menerima parameter untuk mode edit
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateEventScreen()
+      ),
+    ).then((_) {
+      // Refresh data ketika kembali dari edit event
+      setState(() {});
+    });
+  }
+
+  void _showDeleteConfirmation(String eventId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Hapus Event'),
+          content: const Text('Apakah Anda yakin ingin menghapus event ini?'),
+          actions: [
+            TextButton(
+              child: const Text('Batal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                _deleteEvent(eventId);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteEvent(String eventId) {
+    // Hapus event dari list
+    setState(() {
+      events.removeWhere((event) => event['id'] == eventId);
+    });
+    
+    // Tampilkan snackbar konfirmasi
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Event berhasil dihapus'),
+        duration: Duration(seconds: 2),
       ),
     );
   }
