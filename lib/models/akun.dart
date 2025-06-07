@@ -5,6 +5,8 @@ class Akun {
   final String email;
   final String noHp;
   final int roleAkunId;
+  String? password;
+  
 
   Akun({
     required this.id,
@@ -13,6 +15,7 @@ class Akun {
     required this.email,
     required this.noHp,
     required this.roleAkunId,
+    this.password
   });
 
  factory Akun.fromJson(Map<String, dynamic> json) {
@@ -22,7 +25,8 @@ class Akun {
     noHp: json['no_hp']?.toString() ?? '',
     nama: json['nama']?.toString() ?? '',
     email: json['email']?.toString() ?? '',
-    roleAkunId: json['role_akun_id']?.toInt() ?? 0,  // Handle null dan konversi
+    roleAkunId: json['role_akun_id']?.toInt() ?? 0,
+    password: json['password']?.toString() ?? '',
   );
 }
   Map<String, dynamic> toJson() => {
@@ -32,5 +36,6 @@ class Akun {
         'email': email,
         'no_hp': noHp,
         'role_akun_id': roleAkunId,
+        'password': password
       };
 }

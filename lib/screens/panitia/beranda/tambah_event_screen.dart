@@ -328,9 +328,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   if (value == null || value.isEmpty) {
                     return "Wajib diisi";
                   }
-                  // if (value.length < 10) {
-                  //   return "Minimal 10 karakter";
-                  // }
+                  if (value.length < 10) {
+                    return "Minimal 10 karakter";
+                  }
                 },
               ),
               // Lokasi manual (Alamat)

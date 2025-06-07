@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
 import 'package:pbmuas/view_models/auth_v_model.dart';
 import 'package:pbmuas/helpers/session_helper.dart';
+import 'package:pbmuas/screens/sign_up.dart';
+import 'package:pbmuas/screens/lupa_password.dart';
 class sign_in extends StatefulWidget {
   const sign_in({super.key});
 
@@ -12,10 +15,9 @@ class sign_in extends StatefulWidget {
 class _SignInState extends State<sign_in> {
   bool _isObscure = true;
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _staySigned = false;
-
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthVModel>(context);
@@ -24,166 +26,201 @@ class _SignInState extends State<sign_in> {
     final height = size.height;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFD1E4FF),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            transform: GradientRotation(3.47),
-            colors: [
-              Color.fromRGBO(209, 228, 255, 1),
-              Color.fromRGBO(153, 250, 255, 1),
-              Color.fromRGBO(102, 186, 255, 1),
-              Color.fromRGBO(69, 177, 255, 1),
-            ],
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.topRight,
+                transform: GradientRotation(3.274),
+                colors: [
+                  Color.fromRGBO(194, 219, 255, 1), 
+                  Color(0xFF66BAFF),
+                  Color(0xFF45B1FF),
+                ],
+                stops: [0.0, 0.6, 1.0],
+              ),
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
+
+          Column(
+            children: [
+              Container(
+                height: height * 0.25,
                 width: double.infinity,
-                height: height * 0.70,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
+                padding: EdgeInsets.only(left: width * 0.06, top: height * 0.08),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Hello\nEHO Friends",
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: width * 0.075,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: width * 0.06,
-                  vertical: height * 0.04,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Gmail",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: width * 0.04,
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w500,
-                      ),
+              ),
+
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
                     ),
-                    SizedBox(height: height * 0.01),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        hintText: 'masukkan gmail anda',
-                        hintStyle: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: width * 0.035,
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.email_outlined,
-                          color: Colors.grey,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color.fromARGB(255, 188, 188, 188),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.1,
+                    vertical: height * 0.04,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Login",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: width * 0.072,
+                            fontWeight: FontWeight.bold,
+                            color: const Color.fromARGB(255, 0, 60, 119),
                           ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
+                        SizedBox(height: height * 0.02),
+
+                        Text(
+                          "Username",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: width * 0.04,
                             color: Colors.blue,
-                            width: 2,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
-                    ),
-                    SizedBox(height: height * 0.03),
-                    Text(
-                      "Password",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: width * 0.04,
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(height: height * 0.01),
-                    TextFormField(
-                      obscureText: _isObscure,
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        hintText: 'masukkan password anda',
-                        hintStyle: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: width * 0.035,
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.lock_outline,
-                          color: Colors.grey,
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isObscure
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.blue,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isObscure = !_isObscure;
-                            });
+                        SizedBox(height: height * 0.01),
+                        TextFormField(
+                          controller: _usernameController,
+                          validator: (value){
+                            if (value == null || value.isEmpty) {
+                              return "Wajib diisi";
+                            }
+                            if (value.length < 5) {
+                              return "Minimal 5 karakter";
+                            }
                           },
+                          decoration: InputDecoration(
+                            hintText: 'Masukkan username anda',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: width * 0.035,
+                            ),
+                            prefixIcon: const Icon(Icons.person, color: Colors.grey),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Color(0xFFBCBCBC)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.blue, width: 2),
+                            ),
+                          ),
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Colors.blue),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
+
+                        SizedBox(height: height * 0.03),
+
+                        Text(
+                          "Password",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: width * 0.04,
                             color: Colors.blue,
-                            width: 2,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
-                    ),
-                    SizedBox(height: height * 0.015),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        'Lupa Password?',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: width * 0.032,
-                          color: Colors.blue[700],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: height * 0.035),
-                    Center(
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: height * 0.065,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(
-                              255,
-                              0,
-                              102,
-                              204,
+                        SizedBox(height: height * 0.01),
+                        TextFormField(
+                          obscureText: _isObscure,
+                          controller: _passwordController,
+                          validator: (value){
+                            if (value == null || value.isEmpty) {
+                              return "Password wajib diisi";
+                            }
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Masukkan password anda',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: width * 0.035,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                            prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isObscure ? Icons.visibility_off : Icons.visibility,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isObscure = !_isObscure;
+                                });
+                              },
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.blue),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.blue, width: 2),
                             ),
                           ),
+                        ),
+
+                        SizedBox(height: height * 0.015),
+
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const lupa_password()),
+                              );
+                            },
+                            child: Text(
+                              'Lupa Password?',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: width * 0.032,
+                                color: Colors.blue[700],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: height * 0.035),
+
+                        SizedBox(
+                          width: double.infinity,
+                          height: height * 0.065,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF0066CC),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
                           onPressed: () async {
                             final auth = Provider.of<AuthVModel>(
                               context,
                               listen: false,
                             );
-                            if (_emailController.text.isEmpty ||
+                            if (_usernameController.text.isEmpty ||
                                 _passwordController.text.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -197,7 +234,7 @@ class _SignInState extends State<sign_in> {
                             }
                             try {
                              final success = await auth.login(
-                                _emailController.text,
+                                _usernameController.text,
                                 _passwordController.text,
                                 _staySigned,
                               );
@@ -232,7 +269,7 @@ class _SignInState extends State<sign_in> {
                                 }
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Login gagal')),
+                                  const SnackBar(content: Text('Username atau password salah')),
                                 );
                               }
                               // ... lanjutan flow
@@ -242,59 +279,55 @@ class _SignInState extends State<sign_in> {
                               );
 }
                           },
-                          child: Text(
-                            'SIGN IN',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: width * 0.045,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: height * 0.02),
-                    Center(
-                      child: RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: width * 0.03,
-                            color: Colors.black54,
-                          ),
-                          children: const [
-                            TextSpan(text: "Tidak memiliki Akun? "),
-                            TextSpan(
-                              text: "SIGN UP",
+                            child: Text(
+                              'SIGN IN',
                               style: TextStyle(
-                                color: Colors.blue,
+                                fontFamily: 'Poppins',
+                                fontSize: width * 0.045,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                        SizedBox(height: height * 0.02),
+
+                        Center(
+                          child: RichText(
+                            text: TextSpan(
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: width * 0.03,
+                                color: Colors.black54,
+                              ),
+                              children: [
+                                const TextSpan(text: "Tidak memiliki akun? "),
+                                TextSpan(
+                                  text: "SIGN UP",
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const sign_up()),
+                                      );
+                                    },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              top: height * 0.08,
-              left: width * 0.06,
-              child: Text(
-                "Hello\nSign in!",
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: width * 0.075,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
