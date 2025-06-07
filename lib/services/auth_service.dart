@@ -6,11 +6,11 @@ import 'package:pbmuas/models/akun.dart';
 class AuthService {
   final String apiUrl = '${url.baseUlr}/auth';
 
-  Future<String?> login(String email, String password) async {
+  Future<String?> login(String username, String password) async {
     try {
-       final payload = {'email': email, 'password': password};
+       final payload = {'username': username, 'password': password};
 
-      print('Sending payload: $payload'); // Debug
+    
 
       final response = await http.post(
         Uri.parse('$apiUrl/login'),
@@ -31,6 +31,21 @@ class AuthService {
       } catch (e) {
         print('Terjadi kesalahan: $e');
         return null;
+    }
+  }
+
+  Future<bool> register(Akun akun) async {
+    final response = await http.post(
+      Uri.parse('$apiUrl/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(akun.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      print('Error: ${response.body}');
+      return false;
     }
   }
 

@@ -12,12 +12,12 @@ class AuthVModel extends ChangeNotifier {
   Akun? _akun;
   Akun? get akun => _akun;
 
-  Future<bool> login(String email, String password, bool staySigned) async {
+  Future<bool> login(String username, String password, bool staySigned) async {
   _isLoading = true;
   notifyListeners();
 
   try {
-    final token = await _service.login(email, password);
+    final token = await _service.login(username, password);
     if (token == null) {
       print('Token null dari service');
       _isLoading = false;
@@ -38,10 +38,10 @@ class AuthVModel extends ChangeNotifier {
 
     final akun = Akun(
       id: payload['id'] as int,
-      username: payload['username']?.toString() ?? '',
+      username: username,
       nama: payload['nama']?.toString() ?? '',
       noHp: payload['no_hp']?.toString() ?? '',
-      email: email,
+      email: payload['email']?.toString() ?? '',
       roleAkunId: payload['role_akun_id'] as int,
     );
     
@@ -81,6 +81,21 @@ class AuthVModel extends ChangeNotifier {
     if (isLogged) {
       _akun = await SessionHelper.getUser();
       notifyListeners();
+    }
+  }
+
+  Future<bool> register(Akun akun) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final success = await _service.register(akun);
+      _isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 
