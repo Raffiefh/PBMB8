@@ -193,7 +193,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Jumlah tiket harus lebih dari 0")),
         );
-        return;
+        return ;
       } else if (jumlahTiket >= 500) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
