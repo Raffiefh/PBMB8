@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:pbmuas/models/akun.dart';
 import 'sign_in.dart';
 import 'package:pbmuas/view_models/auth_v_model.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,7 @@ class sign_up extends StatefulWidget {
 class _SignUpState extends State<sign_up> {
   bool _isObscure = true;
   bool _isLoading = false;
-  String _selectedRole = 'User';
+  String _selectedRole = '2';
   final _formKey = GlobalKey<FormState>();
   final _namaController = TextEditingController();
   final _usernameController = TextEditingController();
@@ -49,9 +50,54 @@ class _SignUpState extends State<sign_up> {
   }
 
   void _register() async {
+   
     if (!_formKey.currentState!.validate()) return;
+    final role = int.tryParse(_selectedRole) ?? 0;
     setState(() => _isLoading = true);
+    
+    final akunBaru = Akun(
+      nama: _namaController.text,
+      username: _usernameController.text,
+      email: _emailController.text,
+      password: _passwordController.text,
+      noHp: _noHpController.text,
+      roleAkunId: role,
+    );
+
+    final auth = Provider.of<AuthVModel>(context, listen: false);
+    final String? errorMessage = await auth.register(akunBaru);
+    setState(() => _isLoading = false);
+    if (errorMessage == null) {
+      Navigator.pushReplacementNamed(context, '/login');
+      _tampilanPesanSuccess();
+      
+    } else {
+      Flushbar(
+        messageText: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white), // Ganti ikon untuk error
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                errorMessage, // Tampilkan pesan error dari backend
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.redAccent, // Ganti warna untuk error
+        duration: const Duration(milliseconds: 2500),
+        flushbarPosition: FlushbarPosition.TOP,
+        margin: const EdgeInsets.all(12),
+        borderRadius: BorderRadius.circular(10),
+        animationDuration: const Duration(milliseconds: 3000),
+        forwardAnimationCurve: Curves.easeOutBack,
+        reverseAnimationCurve: Curves.easeIn,
+        flushbarStyle: FlushbarStyle.FLOATING,
+      ).show(context);
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -124,33 +170,57 @@ class _SignUpState extends State<sign_up> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildLabel("Nama Lengkap", width),
-                            SizedBox(height: height * 0.01),
+                          SizedBox(height: height * 0.01),
                           _buildTextField(
                             "Masukkan nama lengkap",
                             width,
                             controller: _namaController,
                             prefixIcon: Icons.contact_emergency_outlined,
+                            validator: (value) {
+                              final nama = _namaController.text;
+                              if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(nama)) {
+                                return "Nama hanya boleh mengandung huruf dan spasi.";
+                              }
+                              if (nama.length < 5) {
+                                return "Nama lengkap minimal 5 karakter";
+                              }
+                            },
                           ),
 
                           SizedBox(height: height * 0.015),
                           _buildLabel("Email", width),
-                            SizedBox(height: height * 0.01),
+                          SizedBox(height: height * 0.01),
                           _buildTextField(
                             "Masukkan email",
                             width,
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: Icons.email_outlined,
+                            validator: (value){
+                              final email = _emailController.text;
+                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+                                return "Format email tidak valid";
+                              }
+                            }
                           ),
 
                           SizedBox(height: height * 0.015),
                           _buildLabel("Username", width),
-                            SizedBox(height: height * 0.01),
+                          SizedBox(height: height * 0.01),
                           _buildTextField(
                             "Masukkan username",
                             width,
                             controller: _usernameController,
                             prefixIcon: Icons.person_outlined,
+                             validator: (value){
+                              final username = _usernameController.text;
+                              if (username.contains(' ')) {
+                                return "Username tidak boleh mengandung spasi.";
+                              }
+                              if (username.length < 5) {
+                                return "Username minimal 5 karakter";
+                              }
+                            }
                           ),
 
                           SizedBox(height: height * 0.015),
@@ -164,7 +234,7 @@ class _SignUpState extends State<sign_up> {
                                 return "Masukan password tidak boleh kosong";
                               }
                               if (value.length < 8) {
-                                return "Minimal 8 karakter";
+                                return "Password minimal 8 karakter";
                               }
                               return null;
                             },
@@ -191,26 +261,40 @@ class _SignUpState extends State<sign_up> {
                                   });
                                 },
                               ),
-                               border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFBCBCBC)),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Color(0xFFBCBCBC),
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2),
+                                borderSide: const BorderSide(
+                                  color: Colors.blue,
+                                  width: 2,
+                                ),
                               ),
                             ),
                           ),
 
                           SizedBox(height: height * 0.015),
                           _buildLabel("No. Telepon", width),
-                            SizedBox(height: height * 0.01),
+                          SizedBox(height: height * 0.01),
                           _buildTextField(
                             "Masukkan nomor telepon",
                             width,
                             controller: _noHpController,
                             keyboardType: TextInputType.phone,
                             prefixIcon: Icons.phone_outlined,
+                            validator: (value){
+                              final noHp = _noHpController.text;
+                              if (!RegExp(r'^[0-9]+$').hasMatch(noHp)) {
+                                return "Nomor telepon hanya boleh mengandung angka.";
+                              }
+                              if (noHp.length < 9) {
+                                return "Nomor telepon minimal 10 angka";
+                              }
+                            }
                           ),
 
                           SizedBox(height: height * 0.025),
@@ -218,7 +302,7 @@ class _SignUpState extends State<sign_up> {
                           Row(
                             children: [
                               Radio<String>(
-                                value: 'User',
+                                value: '2',
                                 groupValue: _selectedRole,
                                 activeColor: Colors.blue,
                                 onChanged: (value) {
@@ -230,7 +314,7 @@ class _SignUpState extends State<sign_up> {
                               const Text('User'),
 
                               Radio<String>(
-                                value: 'Penyelenggara',
+                                value: '1',
                                 groupValue: _selectedRole,
                                 activeColor: Colors.blue,
                                 onChanged: (value) {
@@ -267,7 +351,7 @@ class _SignUpState extends State<sign_up> {
                                       : null,
                               label:
                                   _isLoading
-                                      ? const Text("Menyimpan...")
+                                      ? const Text("")
                                       : const Text(
                                         'SIGN UP',
                                         style: TextStyle(
@@ -349,8 +433,7 @@ class _SignUpState extends State<sign_up> {
 
   Widget _buildTextField(
     String hint,
-    double width,
-     {
+    double width, {
     required TextEditingController controller,
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
@@ -360,27 +443,21 @@ class _SignUpState extends State<sign_up> {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
-      validator:
-          validator ??
-          (value) {
-            if (value == null || value.trim().isEmpty) {
-              return '$hint tidak boleh kosong';
-            }
-            return null;
-          },
+      validator: (value) {
+      if (value == null || value.trim().isEmpty) {
+        return '$hint tidak boleh kosong';
+      }
+      if (validator != null) {
+        return validator(value); 
+      }
+      return null;
+    },
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: width * 0.035,
-        ),
-        prefixIcon: prefixIcon != null
-          ? Icon(
-              prefixIcon,
-              color: Colors.grey,
-            )
-          : null,
-       border: OutlineInputBorder(
+        hintStyle: TextStyle(fontFamily: 'Poppins', fontSize: width * 0.035),
+        prefixIcon:
+            prefixIcon != null ? Icon(prefixIcon, color: Colors.grey) : null,
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFFBCBCBC)),
         ),

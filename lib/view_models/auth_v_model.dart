@@ -84,18 +84,20 @@ class AuthVModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> register(Akun akun) async {
+  Future<String?> register(Akun akun) async {
     _isLoading = true;
     notifyListeners();
     try {
-      final success = await _service.register(akun);
+      // final success = await _service.register(akun);
+      final String? errorMessage = await _service.register(akun);
       _isLoading = false;
       notifyListeners();
-      return success;
+      return errorMessage;
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      return false;
+      print('Error in AuthVModel register: $e');
+      return 'Terjadi kesalahan tidak terduga saat pendaftaran.';
     }
   }
 
