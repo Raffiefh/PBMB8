@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
       useInheritedMediaQuery: true,
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
-      home: const SplashScreen(),
+      home: const NavbarPanitia(),
       routes: {
         '/login': (context) => const sign_in(),
         '/panitia': (context) => const NavbarPanitia(),
