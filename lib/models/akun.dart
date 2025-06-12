@@ -1,5 +1,5 @@
 class Akun {
-  final int id;
+  int? id;
   final String username;
   final String nama;
   final String email;
@@ -9,7 +9,7 @@ class Akun {
   
 
   Akun({
-    required this.id,
+    this.id,
     required this.username,
     required this.nama,
     required this.email,
@@ -25,7 +25,7 @@ class Akun {
     noHp: json['no_hp']?.toString() ?? '',
     nama: json['nama']?.toString() ?? '',
     email: json['email']?.toString() ?? '',
-    roleAkunId: json['role_akun_id']?.toInt() ?? 0,
+    roleAkunId: json['role_akun']?.toInt() ?? 0,
     password: json['password']?.toString() ?? '',
   );
 }
@@ -35,7 +35,7 @@ class Akun {
         'nama': nama,
         'email': email,
         'no_hp': noHp,
-        'role_akun_id': roleAkunId,
+        'role_akun': roleAkunId,
         'password': password
       };
 }

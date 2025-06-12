@@ -5,6 +5,7 @@ import 'package:pbmuas/view_models/auth_v_model.dart';
 import 'package:pbmuas/helpers/session_helper.dart';
 import 'package:pbmuas/screens/sign_up.dart';
 import 'package:pbmuas/screens/lupa_password.dart';
+import 'package:another_flushbar/flushbar.dart';
 class sign_in extends StatefulWidget {
   const sign_in({super.key});
 
@@ -18,6 +19,60 @@ class _SignInState extends State<sign_in> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _staySigned = false;
+  bool _isLoading = false;
+  void _login() async{
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+    final auth = Provider.of<AuthVModel>(context,listen: false,);
+   
+    try {
+      final success = await auth.login(
+        _usernameController.text,
+        _passwordController.text,
+        _staySigned,
+      );
+      // Debug: Cek state terakhir
+        print('Login success: $success');
+        print('Akun setelah login: ${auth.akun?.toJson()}');
+        print('Token setelah login: ${await SessionHelper.getToken()}');
+      if (success) {
+        // Tambahkan delay kecil untuk memastikan state terupdate
+        await Future.delayed(const Duration(milliseconds: 50));
+        final user = auth.akun ?? await SessionHelper.getUser();
+        if (user == null) {
+          print('ERROR: User null padahal login sukses');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Gagal memuat data user')),
+          );
+          return;
+        }
+
+        print('Role ID: ${user.roleAkunId}');
+        switch (user.roleAkunId) {
+          case 1:
+            Navigator.pushReplacementNamed(context, '/panitia');
+            break;
+          case 2:
+            Navigator.pushReplacementNamed(context, '/peserta');
+            break;
+          default:
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Role user tidak dikenali')),
+            );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Username atau password salah')),
+        );
+        _isLoading = false;
+      }
+      // ... lanjutan flow
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+}
+  }
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthVModel>(context);
@@ -80,6 +135,8 @@ class _SignInState extends State<sign_in> {
                     vertical: height * 0.04,
                   ),
                   child: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -108,14 +165,14 @@ class _SignInState extends State<sign_in> {
                           controller: _usernameController,
                           validator: (value){
                             if (value == null || value.isEmpty) {
-                              return "Wajib diisi";
+                              return "Masukan username tidak boleh kosong";
                             }
                             if (value.length < 5) {
                               return "Minimal 5 karakter";
                             }
                           },
                           decoration: InputDecoration(
-                            hintText: 'Masukkan username anda',
+                            hintText: 'Masukkan username',
                             hintStyle: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: width * 0.035,
@@ -149,11 +206,11 @@ class _SignInState extends State<sign_in> {
                           controller: _passwordController,
                           validator: (value){
                             if (value == null || value.isEmpty) {
-                              return "Password wajib diisi";
+                              return "Masukan password tidak boleh kosong";
                             }
                           },
                           decoration: InputDecoration(
-                            hintText: 'Masukkan password anda',
+                            hintText: 'Masukkan password',
                             hintStyle: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: width * 0.035,
@@ -205,91 +262,49 @@ class _SignInState extends State<sign_in> {
 
                         SizedBox(height: height * 0.035),
 
-                        SizedBox(
-                          width: double.infinity,
-                          height: height * 0.065,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF0066CC),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                          onPressed: () async {
-                            final auth = Provider.of<AuthVModel>(
-                              context,
-                              listen: false,
-                            );
-                            if (_usernameController.text.isEmpty ||
-                                _passwordController.text.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Email dan password harus diisi!',
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                              return;
-                            }
-                            try {
-                             final success = await auth.login(
-                                _usernameController.text,
-                                _passwordController.text,
-                                _staySigned,
-                              );
-                              // Debug: Cek state terakhir
-                                print('Login success: $success');
-                                print('Akun setelah login: ${auth.akun?.toJson()}');
-                                print('Token setelah login: ${await SessionHelper.getToken()}');
-                              if (success) {
-                                // Tambahkan delay kecil untuk memastikan state terupdate
-                                await Future.delayed(const Duration(milliseconds: 50));
-                                final user = auth.akun ?? await SessionHelper.getUser();
-                                if (user == null) {
-                                  print('ERROR: User null padahal login sukses');
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Gagal memuat data user')),
-                                  );
-                                  return;
-                                }
-
-                                print('Role ID: ${user.roleAkunId}');
-                                switch (user.roleAkunId) {
-                                  case 1:
-                                    Navigator.pushReplacementNamed(context, '/panitia');
-                                    break;
-                                  case 2:
-                                    Navigator.pushReplacementNamed(context, '/peserta');
-                                    break;
-                                  default:
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Role user tidak dikenali')),
-                                    );
-                                }
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Username atau password salah')),
-                                );
-                              }
-                              // ... lanjutan flow
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: ${e.toString()}')),
-                              );
-}
-                          },
-                            child: Text(
-                              'SIGN IN',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: width * 0.045,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                          SizedBox(
+                            width: double.infinity,
+                            height: height * 0.065,
+                            child: ElevatedButton.icon(
+                              onPressed: _isLoading ? null : _login,
+                              icon:
+                                  _isLoading
+                                      ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onPrimary,
+                                              ),
+                                        ),
+                                      )
+                                      : null,
+                              label:
+                                  _isLoading
+                                      ? const Text("")
+                                      : const Text(
+                                        'SIGN IN',
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize: 380 * 0.045,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size.fromHeight(48),
+                                backgroundColor: const Color(0xFF0066CC),
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: Colors.grey[400],
+                                disabledForegroundColor:
+                                    Colors.white, // Contoh styling
                               ),
                             ),
                           ),
-                        ),
                         SizedBox(height: height * 0.02),
 
                         Center(
@@ -321,6 +336,7 @@ class _SignInState extends State<sign_in> {
                           ),
                         ),
                       ],
+                    ),
                     ),
                   ),
                 ),
