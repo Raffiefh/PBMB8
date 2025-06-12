@@ -207,7 +207,7 @@ class _BerandaPesertaState extends State<BerandaPeserta> {
               mainAxisSize: MainAxisSize.min,
               children: const [
                 Text(
-                  'Halo Raffi',
+                  'Halo Agung Indra',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 4),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pbmuas/view_models/auth_v_model.dart';
-import 'package:pbmuas/screens/widgets/panitia_navbar.dart';
 import 'package:provider/provider.dart';
 
 class AkunContent extends StatelessWidget {

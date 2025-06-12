@@ -7,21 +7,21 @@ part of 'event.dart';
 // **************************************************************************
 
 Event _$EventFromJson(Map<String, dynamic> json) => Event(
-  id: (json['id'] as num).toInt(),
-  judul: json['judul'] as String,
-  deskripsi: json['deskripsi'] as String,
-  tanggalEvent: json['tanggal_event'] as String,
-  jamMulai: json['jam_mulai'] as String,
-  durasiEvent: (json['durasi_event'] as num).toInt(),
-  tipeTiket: (json['tipe_tiket'] as num).toInt(),
-  jumlahTiket: (json['jumlah_tiket'] as num).toInt(),
+  id: (json['id'] as num?)?.toInt(),
+  judul: json['judul'] as String?,
+  deskripsi: json['deskripsi'] as String?,
+  tanggalEvent: json['tanggal_event'] as String?,
+  jamMulai: json['jam_mulai'] as String?,
+  durasiEvent: (json['durasi_event'] as num?)?.toInt(),
+  tipeTiket: (json['tipe_tiket'] as num?)?.toInt(),
+  jumlahTiket: (json['jumlah_tiket'] as num?)?.toInt(),
   hargaTiket: (json['harga_tiket'] as num?)?.toDouble(),
-  lokasi: json['lokasi'] as String,
-  latitude: (json['latitude'] as num).toDouble(),
-  longitude: (json['longitude'] as num).toDouble(),
-  fotoUrl: json['foto_url'] as String,
-  akunId: (json['akun_id'] as num).toInt(),
-  createdAt: json['created_at'] as String,
+  lokasi: json['lokasi'] as String?,
+  latitude: (json['latitude'] as num?)?.toDouble(),
+  longitude: (json['longitude'] as num?)?.toDouble(),
+  fotoUrl: json['foto_url'] as String?,
+  akunId: (json['akun_id'] as num?)?.toInt(),
+  createdAt: json['created_at'] as String?,
 );
 
 Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{

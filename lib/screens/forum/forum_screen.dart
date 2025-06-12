@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbmuas/view_models/forum_v_model.dart';
 import 'package:pbmuas/view_models/auth_v_model.dart'; // kalau belum diimpor
-import 'package:pbmuas/models/forum.dart';
+
 
 class ForumContent extends StatefulWidget {
   const ForumContent({Key? key}) : super(key: key);
