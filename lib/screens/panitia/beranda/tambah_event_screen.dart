@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:pbmuas/screens/panitia/beranda/beranda_screen.dart';
 import 'package:provider/provider.dart';
 import 'location_screen.dart';
 import 'package:image_picker/image_picker.dart';
@@ -73,8 +71,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           ),
         ],
       ),
-      backgroundColor: Colors.green,
-      duration: const Duration(seconds: 2),
+      backgroundColor: Colors.blueAccent,
+      duration: const Duration(milliseconds: 2500),
       flushbarPosition: FlushbarPosition.TOP,
       margin: const EdgeInsets.all(12),
       borderRadius: BorderRadius.circular(10),
@@ -101,7 +99,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       ),
       backgroundColor: Colors.redAccent,
       duration: const Duration(seconds: 2),
-      flushbarPosition: FlushbarPosition.TOP, 
+      flushbarPosition: FlushbarPosition.TOP,
       margin: const EdgeInsets.all(12),
       borderRadius: BorderRadius.circular(10),
       animationDuration: const Duration(milliseconds: 3000),
@@ -142,6 +140,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   void _submitForm() async {
+    // Navigator.of(context).pop();
+    // _tampilanPesanSuccess();
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     if (_tanggalEvent == null || _jamMulai == null) {
@@ -159,15 +159,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
 
     if (koordinat == null) {
-       ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: const Text("Lokasi event harus dipilih"),
-    
-    ),
-  );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: const Text("Lokasi event harus dipilih")),
+      );
 
       return;
-      
     }
     try {
       final jamMulaiString = _jamMulai!.format(context);
@@ -189,26 +185,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       final authModel = Provider.of<AuthVModel>(context, listen: false);
       final akun = authModel.akun!.id;
       final jumlahTiket = int.tryParse(_jumlahController.text) ?? 0;
-      if (jumlahTiket <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Jumlah tiket harus lebih dari 0")),
-        );
-        return ;
-      } else if (jumlahTiket >= 500) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Jumlah tiket tidak boleh lebih dari 500"),
-          ),
-        );
-        return;
-      } else if (jumlahTiket < 50) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Jumlah tiket tidak boleh kurang dari 50"),
-          ),
-        );
-        return;
-      }
 
       // Jika tipe tiket berbayar, validasi harga
       double? hargaTiket;
@@ -251,7 +227,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     } catch (e) {
       if (mounted) {
         _tampilanPesanError();
-        
       }
     } finally {
       if (mounted) {
@@ -297,6 +272,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
     return Scaffold(
       appBar: AppBar(title: const Text('Tambah Event')),
       body: SingleChildScrollView(
@@ -306,40 +284,45 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Nama Event
-              TextFormField(
+              _buildTextField(
+                "Nama Event",
+                width,
                 controller: _judulController,
-                decoration: const InputDecoration(labelText: "Nama Event"),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Wajib diisi";
-                  }
-                  if (value.length < 5) {
+                  if (value!.length < 5) {
                     return "Minimal 5 karakter";
                   }
+                  return null;
                 },
               ),
               const SizedBox(height: 12),
-
-              TextFormField(
+              _buildTextField(
+                "Deskripsi Event", 
+                width,
                 controller: _deskripsiController,
-                decoration: const InputDecoration(labelText: "Deskripsi Event"),
+                keyboardType: TextInputType.multiline, 
+                minLines: 3, 
+                maxLines: 5,
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Wajib diisi";
+                  if (value!.length < 10) { 
+                    return "Deskripsi minimal 10 karakter";
                   }
-                  if (value.length < 10) {
-                    return "Minimal 10 karakter";
-                  }
+                  return null;
                 },
-              ),
+          ),
               // Lokasi manual (Alamat)
-              TextFormField(
+              _buildTextField(
+                "Lokasi Event", 
+                width,
                 controller: _lokasiController,
-                decoration: const InputDecoration(
-                  labelText: "Alamat Lokasi (Deskripsi)",
-                ),
-                validator: (value) => value!.isEmpty ? "Wajib diisi" : null,
+                validator: (value) {
+                  if (value!.length < 5) { 
+                    return "Minimal 5 karakter";
+                  }else if (!RegExp(r"^[a-zA-Z0-9\s]+$").hasMatch(value)) {
+                    return "Lokasi tidak boleh mengandung simbol.";
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 12),
 
@@ -400,35 +383,66 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 validator: (val) => val == null ? "Pilih tipe tiket" : null,
               ),
               if (_tipeTiket == 2)
-                TextFormField(
+                _buildTextField(
+                  "Harga Tiket",
+                  width,
                   controller: _hargaController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: "Harga Tiket"),
-                  validator: (val) => val!.isEmpty ? "Masukkan harga" : null,
-                ),
+                  validator: (value){
+                    final parsedValue  = int.tryParse(value!);
+                    if (parsedValue == null) {
+                      return "Masukkan angka yang valid";
+                    }
+                    if (parsedValue <= 0) {
+                      return "Masukkan angka yang valid (lebih dari 0)";
+                    }
+                    if (parsedValue > 1000000) {
+                      return "Harga tiket tidak boleh lebih dari 1.000.000";
+                    }
+                    return null;
+                  }),
+               
               const SizedBox(height: 12),
-              TextFormField(
+              _buildTextField(
+                "Jumlah Tiket",
+                width,
                 controller: _jumlahController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: "Jumlah Tiket"),
-              ),
-              // Durasi Event (dalam menit)
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: "Durasi Event (jam)",
-                ),
-                controller: _durasiController,
-                keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Wajib diisi";
-                  }
-                  if (int.tryParse(value) == null || int.parse(value) <= 0) {
+                  final parsedValue  = int.tryParse(value!);
+                  if (parsedValue == null) {
                     return "Masukkan angka yang valid";
+                  }
+                  if (parsedValue <= 0) {
+                    return "Masukkan angka yang valid (lebih dari 0)";
+                  }
+                  if (parsedValue > 500) {
+                    return "Jumlah tiket tidak boleh lebih dari 500";
+                  } 
+                  if (parsedValue < 50) {
+                    return "Jumlah tiket tidak boleh kurang dari 50";
                   }
                   return null;
                 },
-                // onSaved: (value) => durasi = int.parse(value!),
+              ),
+              // Durasi Event (dalam menit)
+              _buildTextField(
+                "Durasi Event (jam)",
+                width,
+                controller: _durasiController,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  final parsedValue  = int.tryParse(value!);
+                  if (parsedValue == null) {
+                    return "Masukkan angka yang valid";
+                  }
+                  if (parsedValue <= 0) {
+                    return "Masukkan angka yang valid (lebih dari 0)";
+                  }if (parsedValue > 10) {
+                    return "Durasi tidak boleh lebih dari 10 jam";
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 12),
 
@@ -508,17 +522,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   ),
                 ),
               ),
-              // if (koordinat == null)
-              //   Padding(
-              //     padding: const EdgeInsets.only(top: 8.0),
-              //     child: Text(
-              //       "Lokasi GPS wajib dipilih",
-              //       style: TextStyle(
-              //         color: Theme.of(context).colorScheme.error,
-              //         fontSize: 12,
-              //       ),
-              //     ),
-              //   ),
               const SizedBox(height: 24),
 
               // Simpan
@@ -551,6 +554,55 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+ 
+
+  Widget _buildTextField(
+    String hint, 
+    double width, {
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+    Color? underlineColor,
+    Color? focusedUnderlineColor,
+    int? maxLines, 
+    int? minLines,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines, 
+      minLines: minLines, 
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return '$hint tidak boleh kosong';
+        }
+        if (validator != null) {
+          return validator(value);
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: hint,
+        hintStyle: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: width * 0.035,
+          color: Colors.blue,
+        ),
+        focusColor: Colors.blue,
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: underlineColor ?? const Color(0xFFBCBCBC),
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: focusedUnderlineColor ?? Colors.blue,
+            width: 2,
           ),
         ),
       ),

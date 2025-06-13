@@ -31,16 +31,11 @@ class _SignInState extends State<sign_in> {
         _passwordController.text,
         _staySigned,
       );
-      // Debug: Cek state terakhir
-        print('Login success: $success');
-        print('Akun setelah login: ${auth.akun?.toJson()}');
         print('Token setelah login: ${await SessionHelper.getToken()}');
       if (success) {
-        // Tambahkan delay kecil untuk memastikan state terupdate
         await Future.delayed(const Duration(milliseconds: 50));
         final user = auth.akun ?? await SessionHelper.getUser();
         if (user == null) {
-          print('ERROR: User null padahal login sukses');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Gagal memuat data user')),
           );

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:pbmuas/view_models/auth_v_model.dart';
 import 'package:pbmuas/view_models/forum_v_model.dart';
+import 'package:pbmuas/view_models/event_v_model.dart';
 import 'package:pbmuas/screens/splash_screen.dart';
 import 'package:pbmuas/screens/widgets/panitia_navbar.dart';
 import 'package:pbmuas/screens/widgets/peserta_navbar .dart';
@@ -47,6 +48,8 @@ void main() async {
             providers: [
               ChangeNotifierProvider(create: (_) => AuthVModel()),
               ChangeNotifierProvider(create: (_) => ForumVModel()),
+              ChangeNotifierProvider(create: (_) => EventVModel()),
+
               ],
             child: MyApp(),
           ),

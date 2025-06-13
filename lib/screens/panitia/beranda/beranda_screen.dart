@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pbmuas/models/event.dart';
 import 'package:pbmuas/screens/panitia/beranda/tambah_event_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:pbmuas/view_models/event_v_model.dart';
 
 class HomePanitiaPage extends StatefulWidget {
   const HomePanitiaPage({super.key});
@@ -9,36 +12,14 @@ class HomePanitiaPage extends StatefulWidget {
 }
 
 class _HomePanitiaPageState extends State<HomePanitiaPage> {
-
-  // Dummy data event (nanti bisa diganti dengan data dari API)
-  final List<Map<String, String>> events = [
-    {
-      'id': '1',
-      'title': 'Konser Sound Horeg',
-      'description': 'Konser musik akbar di Jember!',
-      'date': '12 Juni 2025',
-      'time': '18:00',
-      'location': 'GOR Jember',
-      'ticket_type': 'Gratis',
-      'price': '0',
-      'image': 'https://images.unsplash.com/photo-1503428593586-e225b39bddfe'
-    },
-    {
-      'id': '2',
-      'title': 'Seminar Kewirausahaan',
-      'description': 'Belajar bisnis dari para praktisi',
-      'date': '15 Juli 2025',
-      'time': '09:00',
-      'location': 'Aula Universitas',
-      'ticket_type': 'Berbayar',
-      'price': '50.000',
-      'image': 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407'
-    },
-  ];
-
-
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<EventVModel>(context, listen: false).loadEventsPanitia();
+  }
   @override
   Widget build(BuildContext context) {
+    final eventList = Provider.of<EventVModel>(context);
     return Scaffold(
       backgroundColor: const Color(0xFFDAEAF1),
 
@@ -63,8 +44,7 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
                         builder: (context) => const CreateEventScreen(),
                       ),
                     ).then((_) {
-                      // Refresh data ketika kembali dari tambah event
-                      setState(() {});
+                      Provider.of<EventVModel>(context, listen: false).loadEventsPanitia(); 
                     });
                   },
                   style: ElevatedButton.styleFrom(
@@ -76,25 +56,24 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
               ],
             ),
             const SizedBox(height: 20),
-            Expanded(
-              child: _buildEventList(),
-            ),
+            Expanded(child: _buildEventList(eventList)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEventList() {
+  Widget _buildEventList(EventVModel eventList) {
     return ListView.builder(
-      itemCount: events.length,
+      itemCount: eventList.events.length,
       itemBuilder: (context, index) {
-        return _buildEventCard(events[index]);
+        final event = eventList.events[index];
+        return _buildEventCard(event);
       },
     );
   }
 
-  Widget _buildEventCard(Map<String, String> event) {
+  Widget _buildEventCard(Event event) {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -106,17 +85,18 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: Image.network(
-              event['image']!,
+              event.fotoUrl ?? '',
               height: 180,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                height: 180,
-                color: Colors.grey.shade300,
-                child: const Icon(Icons.broken_image, size: 48),
-              ),
+              errorBuilder:
+                  (context, error, stackTrace) => Container(
+                    height: 180,
+                    color: Colors.grey.shade300,
+                    child: const Icon(Icons.broken_image, size: 48),
+                  ),
             ),
           ),
-          
+
           // Bagian info event
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -124,13 +104,15 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  event['title']!,
+                  event.judul ?? '',
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  event['description']!,
+                  event.deskripsi ?? '',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontSize: 14),
@@ -140,17 +122,19 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
                   spacing: 12,
                   runSpacing: 6,
                   children: [
-                    _iconText(Icons.date_range, event['date']!),
-                    _iconText(Icons.access_time, event['time']!),
-                    _iconText(Icons.location_on, event['location']!),
-                    _iconText(Icons.confirmation_num,
-                        '${event['ticket_type']} - ${event['price']}'),
+                    _iconText(Icons.date_range, event.tanggalEvent ?? ''),
+                    _iconText(Icons.access_time, event.jamMulai ?? ''),
+                    _iconText(Icons.location_on, event.lokasi ?? ''),
+                    _iconText(
+                      Icons.confirmation_num,
+                      '${_tipeTiketText(event.tipeTiket ?? 0)} - ${event.hargaTiket?.toStringAsFixed(0) ?? "Gratis"}',
+                    ),
                   ],
                 ),
               ],
             ),
           ),
-          
+
           // Bagian action buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -164,7 +148,7 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
                     _navigateToDetail(event);
                   },
                 ),
-                
+
                 // Button Edit
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.green),
@@ -172,17 +156,17 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
                     _navigateToEdit(event);
                   },
                 ),
-                
+
                 // Button Delete
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    _showDeleteConfirmation(event['id']!);
-                  },
-                ),
+                // IconButton(
+                //   icon: const Icon(Icons.delete, color: Colors.red),
+                //   onPressed: () {
+                //     _showDeleteConfirmation(event.id);
+                //   },
+                // ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -194,56 +178,78 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
       children: [
         Icon(icon, size: 16, color: Colors.blue),
         const SizedBox(width: 4),
-        Text(
-          text,
-          style: const TextStyle(fontSize: 13, color: Colors.black87),
-        ),
+        Text(text, style: const TextStyle(fontSize: 13, color: Colors.black87)),
       ],
     );
   }
-
-  void _navigateToDetail(Map<String, String> event) {
+    String _tipeTiketText(int tipe) {
+    switch (tipe) {
+      case 1:
+        return 'Gratis';
+      case 2:
+        return 'Berbayar';
+      default:
+        return 'Tidak Diketahui';
+    }
+  }
+  void _navigateToDetail(Event event) {
     // Navigasi ke halaman detail event
     // Buat file baru untuk DetailEventScreen
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(title: Text(event['title']!)),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.network(
-                  event['image']!,
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
+        builder:
+            (context) => Scaffold(
+              appBar: AppBar(title: Text(event.judul ?? '')),
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.network(
+                      event.fotoUrl ?? '',
+                      width: double.infinity,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      event.judul ?? '',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      event.deskripsi ?? '',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailItem(
+                      Icons.date_range,
+                      'Tanggal',
+                      event.tanggalEvent ?? '',
+                    ),
+                    _buildDetailItem(
+                      Icons.access_time,
+                      'Waktu',
+                      event.jamMulai ?? '',
+                    ),
+                    _buildDetailItem(
+                      Icons.location_on,
+                      'Lokasi',
+                      event.lokasi ?? '',
+                    ),
+                    _buildDetailItem(
+                      Icons.confirmation_num,
+                      'Tiket',
+                       '${_tipeTiketText(event.tipeTiket ?? 0)} - ${event.hargaTiket?.toStringAsFixed(0) ?? "Gratis"}',
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  event['title']!,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  event['description']!,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 16),
-                _buildDetailItem(Icons.date_range, 'Tanggal', event['date']!),
-                _buildDetailItem(Icons.access_time, 'Waktu', event['time']!),
-                _buildDetailItem(Icons.location_on, 'Lokasi', event['location']!),
-                _buildDetailItem(Icons.confirmation_num, 'Tiket', 
-                  '${event['ticket_type']} - ${event['price']}'),
-              ],
+              ),
             ),
-          ),
-        ),
       ),
     );
   }
@@ -261,10 +267,7 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
             children: [
               Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               Text(
                 value,
@@ -280,59 +283,57 @@ class _HomePanitiaPageState extends State<HomePanitiaPage> {
     );
   }
 
-  void _navigateToEdit(Map<String, String> event) {
+  void _navigateToEdit(Event event) {
     // Navigasi ke halaman edit event
     // Asumsi TambahEventScreen bisa menerima parameter untuk mode edit
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => CreateEventScreen()
-      ),
+      MaterialPageRoute(builder: (context) => CreateEventScreen()),
     ).then((_) {
       // Refresh data ketika kembali dari edit event
       setState(() {});
     });
   }
 
-  void _showDeleteConfirmation(String eventId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Hapus Event'),
-          content: const Text('Apakah Anda yakin ingin menghapus event ini?'),
-          actions: [
-            TextButton(
-              child: const Text('Batal'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-              onPressed: () {
-                _deleteEvent(eventId);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _showDeleteConfirmation(int eventId) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: const Text('Hapus Event'),
+  //         content: const Text('Apakah Anda yakin ingin menghapus event ini?'),
+  //         actions: [
+  //           TextButton(
+  //             child: const Text('Batal'),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //           TextButton(
+  //             child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+  //             onPressed: () {
+  //               _deleteEvent(eventId);
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
-  void _deleteEvent(String eventId) {
-    // Hapus event dari list
-    setState(() {
-      events.removeWhere((event) => event['id'] == eventId);
-    });
-    
-    // Tampilkan snackbar konfirmasi
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Event berhasil dihapus'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
+  // void _deleteEvent(String eventId) {
+  //   // Hapus event dari list
+  //   setState(() {
+  //     events.removeWhere((event) => event['id'] == eventId);
+  //   });
+
+  //   // Tampilkan snackbar konfirmasi
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(
+  //       content: Text('Event berhasil dihapus'),
+  //       duration: Duration(seconds: 2),
+  //     ),
+  //   );
+  // }
 }
