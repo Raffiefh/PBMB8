@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pbmuas/view_models/auth_v_model.dart';
 import 'package:provider/provider.dart';
-import 'package:pbmuas/screens/peserta/akun/EditProfil.dart';
+import 'package:pbmuas/screens/peserta/akun/edit_akun.dart';
 
 class AkunPeserta extends StatefulWidget {
   const AkunPeserta({super.key});
@@ -13,6 +13,7 @@ class AkunPeserta extends StatefulWidget {
 }
 
 class _AkunPesertaState extends State<AkunPeserta> {
+  late TextEditingController _usernameController;
   late TextEditingController _namaController;
   late TextEditingController _emailController;
   late TextEditingController _noHpController;
@@ -22,6 +23,7 @@ class _AkunPesertaState extends State<AkunPeserta> {
   void initState() {
     super.initState();
     final authVModel = Provider.of<AuthVModel>(context, listen: false);
+    _usernameController = TextEditingController(text: authVModel.akun?.username ?? '-');
     _namaController = TextEditingController(text: authVModel.akun?.nama ?? 'Peserta');
     _emailController = TextEditingController(text: authVModel.akun?.email ?? '-');
     _noHpController = TextEditingController(text: authVModel.akun?.noHp ?? '-');
@@ -29,6 +31,7 @@ class _AkunPesertaState extends State<AkunPeserta> {
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _namaController.dispose();
     _emailController.dispose();
     _noHpController.dispose();
@@ -92,7 +95,7 @@ class _AkunPesertaState extends State<AkunPeserta> {
             const SizedBox(height: 20),
             Center(
               child: Text(
-                _namaController.text,
+                _usernameController.text,
                 style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),

@@ -95,7 +95,7 @@ class _ForumContentState extends State<ForumContent> {
                     onPressed: () async {
                       final text = _controller.text.trim();
                       if (text.isNotEmpty) {
-                        await vm.sendMessage(akun.id ?? 0 ,text, akun.username);
+                        await vm.sendMessage(akun.id ?? 0 ,text, akun.username ?? '');
                         _controller.clear();
                       }
                     },

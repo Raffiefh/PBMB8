@@ -184,6 +184,7 @@ class _SignUpState extends State<sign_up> {
                               if (nama.length < 5) {
                                 return "Nama lengkap minimal 5 karakter";
                               }
+                              return null;
                             },
                           ),
 
@@ -201,6 +202,7 @@ class _SignUpState extends State<sign_up> {
                               if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
                                 return "Format email tidak valid";
                               }
+                              return null;
                             }
                           ),
 
@@ -220,6 +222,7 @@ class _SignUpState extends State<sign_up> {
                               if (username.length < 5) {
                                 return "Username minimal 5 karakter";
                               }
+                              return null;
                             }
                           ),
 
@@ -292,8 +295,9 @@ class _SignUpState extends State<sign_up> {
                                 return "Nomor telepon hanya boleh mengandung angka.";
                               }
                               if (noHp.length < 9) {
-                                return "Nomor telepon minimal 10 angka";
+                                return "Nomor telepon minimal 9 angka";
                               }
+                              return null;
                             }
                           ),
 

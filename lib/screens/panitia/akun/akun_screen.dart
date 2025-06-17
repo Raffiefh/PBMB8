@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pbmuas/view_models/auth_v_model.dart';
 import 'package:provider/provider.dart';
-import 'package:pbmuas/screens/panitia/akun/edit_akun.dart'; // Pastikan path ini sesuai dengan struktur foldermu
-
+import 'package:pbmuas/screens/panitia/akun/edit_akun.dart';
 class AkunContent extends StatefulWidget {
   const AkunContent({super.key});
 
@@ -13,15 +12,17 @@ class AkunContent extends StatefulWidget {
 }
 
 class _AkunContentState extends State<AkunContent> {
+  late TextEditingController _usernameController;
   late TextEditingController _namaController;
   late TextEditingController _emailController;
   late TextEditingController _noHpController;
   File? _profileImage;
-
+  
   @override
   void initState() {
     super.initState();
     final authVModel = Provider.of<AuthVModel>(context, listen: false);
+    _usernameController = TextEditingController(text: authVModel.akun?.username ?? '-');
     _namaController = TextEditingController(text: authVModel.akun?.nama ?? 'Panitia');
     _emailController = TextEditingController(text: authVModel.akun?.email ?? '-');
     _noHpController = TextEditingController(text: authVModel.akun?.noHp ?? '-');
@@ -29,6 +30,7 @@ class _AkunContentState extends State<AkunContent> {
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _namaController.dispose();
     _emailController.dispose();
     _noHpController.dispose();
@@ -91,7 +93,7 @@ class _AkunContentState extends State<AkunContent> {
             const SizedBox(height: 20),
             Center(
               child: Text(
-                _namaController.text,
+                _usernameController.text,
                 style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),

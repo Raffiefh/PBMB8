@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pbmuas/models/akun.dart';
 import 'package:pbmuas/services/auth_service.dart';
 import 'package:pbmuas/helpers/session_helper.dart';
-import 'package:jwt_decode/jwt_decode.dart';
 class AuthVModel extends ChangeNotifier {
   final AuthService _service = AuthService();
 
@@ -17,34 +16,21 @@ class AuthVModel extends ChangeNotifier {
   notifyListeners();
 
   try {
-    final token = await _service.login(username, password);
+    final result = await _service.login(username, password);
+    if (result == null) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+ 
+    final token = result['access_token'];
     if (token == null) {
-      print('Token null dari service');
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-    
-    final payload = Jwt.parseJwt(token);
-    print('Payload JWT: $payload');
-
-    // Validasi payload penting
-    if (payload['id'] == null || payload['role_akun_id'] == null) {
-      print('Payload tidak lengkap');
-      _isLoading = false;
-      notifyListeners();
+      print('Token tidak ditemukan');
       return false;
     }
 
-    final akun = Akun(
-      id: payload['id'] as int,
-      username: username,
-      nama: payload['nama']?.toString() ?? '',
-      noHp: payload['no_hp']?.toString() ?? '',
-      email: payload['email']?.toString() ?? '',
-      roleAkunId: payload['role_akun_id'] as int,
-    );
-    
+
+    final akun = Akun.fromJson(result);
     _akun = akun;
     print('Akun sebelum save: ${akun.toJson()}');
 
@@ -60,7 +46,7 @@ class AuthVModel extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
-    return true; // Pastikan return true jika semua sukses
+    return true; 
   } catch (e, stackTrace) {
     print('Error pada login: $e');
     print('Stack trace: $stackTrace');
@@ -100,38 +86,36 @@ class AuthVModel extends ChangeNotifier {
       return 'Terjadi kesalahan tidak terduga saat pendaftaran.';
     }
   }
+  Future<bool> updateDataAkun(Akun updated) async {
+  _isLoading = true;
+  notifyListeners();
 
-  Future<bool> updateProfile(String username, String nama, String email, String noHp) async{
-    if(akun == null) return false;
-    _isLoading = true;
+  final result = await _service.updateAkun(updated);
+
+  if (result == null) {
+    _isLoading = false;
     notifyListeners();
-
-    try{
-      final updatedAkun = Akun(
-        id: akun!.id, 
-        username: username, 
-        nama: nama, 
-        email: email, 
-        noHp: noHp,
-        // password: akun!.password, 
-        roleAkunId: akun!.roleAkunId
-      );
-      
-      final updated = await _service.updateAkun(updatedAkun);
-      if(updated) {
-        _akun = updatedAkun;
-        await SessionHelper.updateUser(_akun!);
-      }
-      return updated;
-    }catch(e){
-      print("Update profile failed: $e");
-      return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+    return false;
   }
+
+  try {
+    final newToken = result['access_token'];
+    final akunBaru = Akun.fromJson(result);
+
+    _akun = akunBaru;
+    await SessionHelper.saveUserSession(newToken, akunBaru, true);
     
+    _isLoading = false;
+    notifyListeners();
+    return true;
+  } catch (e) {
+    print('Gagal memproses data update: $e');
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  }
+}
+
    
 
 
