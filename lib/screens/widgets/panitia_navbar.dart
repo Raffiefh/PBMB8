@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pbmuas/screens/peserta/akun/akun_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:pbmuas/view_models/auth_v_model.dart';
 import 'package:pbmuas/screens/panitia/akun/akun_screen.dart';
 import 'package:pbmuas/screens/panitia/beranda/beranda_screen.dart';
 import 'package:pbmuas/screens/forum/forum_screen.dart';
-import 'package:pbmuas/screens/panitia/riwayat/riwayat_screen.dart';
+import 'package:pbmuas/screens/panitia/scan/scan_tiket_screen.dart';
 class NavbarPanitia extends StatefulWidget {
   const NavbarPanitia({super.key});
 
@@ -26,11 +25,10 @@ class _NavbarPanitiaState extends State<NavbarPanitia> {
   }
 
   final List<Widget> _pages = [
-    // const BerandaContent(),
-    const HomePanitiaPage(),
+    const BerandaPage(),
     const ForumContent(),
-    const RiwayatContent(),
-    const AkunContent()
+    const ScanQrPage(),
+    const AkunPage()
   ];
   
 

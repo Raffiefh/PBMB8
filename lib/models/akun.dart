@@ -1,41 +1,46 @@
 class Akun {
   int? id;
-  final String username;
-  final String nama;
-  final String email;
-  final String noHp;
-  final int roleAkunId;
+  String? username;
+  String? nama;
+  String? email;
+  String? noHp;
+  int? roleAkunId;
+  String? profilUrl;
   String? password;
   
 
   Akun({
     this.id,
-    required this.username,
-    required this.nama,
-    required this.email,
-    required this.noHp,
-    required this.roleAkunId,
+    this.username,
+    this.nama,
+    this.email,
+    this.noHp,
+    this.roleAkunId,
+    this.profilUrl,
     this.password
   });
 
- factory Akun.fromJson(Map<String, dynamic> json) {
-  return Akun(
-    id: json['id']?.toInt() ?? 0,               // Handle null dan konversi tipe
-    username: json['username']?.toString() ?? '',
-    noHp: json['no_hp']?.toString() ?? '',
-    nama: json['nama']?.toString() ?? '',
-    email: json['email']?.toString() ?? '',
-    roleAkunId: json['role_akun']?.toInt() ?? 0,
-    password: json['password']?.toString() ?? '',
-  );
-}
+  factory Akun.fromJson(Map<String, dynamic> json) {
+    return Akun(
+      id: int.tryParse(json['id'].toString()) ?? 0,
+      username: json['username']?.toString() ?? '',
+      noHp: json['no_hp']?.toString() ?? '',
+      nama: json['nama']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      roleAkunId: int.tryParse(json['role_akun_id'].toString()) ?? 0,
+      profilUrl: json['profil_url']?.toString() ?? '',
+      password: json['password']?.toString(), 
+    );
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'username': username,
         'nama': nama,
         'email': email,
         'no_hp': noHp,
-        'role_akun': roleAkunId,
+        'role_akun_id': roleAkunId,
+        'profil_url': profilUrl,
         'password': password
       };
 }

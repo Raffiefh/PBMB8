@@ -1,12 +1,20 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:pbmuas/const/api_url.dart' as url;
 import 'package:pbmuas/models/akun.dart';
+import 'package:pbmuas/helpers/session_helper.dart';
 
 class AuthService {
   final String apiUrl = '${url.baseUlr}/auth';
-
-  Future<String?> login(String username, String password) async {
+  Future<Map<String, String>> _getHeaders() async {
+    final token = await SessionHelper.getToken();
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+  Future<Map<String, dynamic>?> login(String username, String password) async {
     try {
       final payload = {'username': username, 'password': password};
 
@@ -20,7 +28,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['access_token'];
+        return data;
       } else {
         final errorData = jsonDecode(response.body);
         print('Login gagal: ${errorData['detail']}');
@@ -54,7 +62,7 @@ class AuthService {
           return 'Pendaftaran gagal: ${response.body}';
         }
       } else {
-        // Menangani status code HTTP lainnya (misalnya 500 Internal Server Error, 404 Not Found)
+      
         print(
           'Error during registration: ${response.statusCode} - ${response.body}',
         );
@@ -66,18 +74,42 @@ class AuthService {
     }
   }
 
-  Future<bool> updateAkun(Akun akun) async {
+  Future<Map<String, dynamic>?> updateAkun(Akun akun) async {
+    final headers = await _getHeaders();
     final response = await http.put(
-      Uri.parse('$apiUrl/profile/${akun.id}'),
-      headers: {'Content-Type': 'application/json'},
+      Uri.parse('$apiUrl/profile'),
+      headers: headers,
       body: jsonEncode(akun.toJson()),
     );
 
+    
     if (response.statusCode == 200) {
-      return true;
+      final data = jsonDecode(response.body);
+      return data; // return full response yang termasuk token dan akun baru
     } else {
-      print('Error: ${response.body}');
-      return false;
+      print('Update error: ${response.body}');
+      return null;
     }
+  }
+  
+  Future<String?> uploadFoto(File foto) async{
+    final headers = await _getHeaders();
+    final request = http.MultipartRequest(
+      'PUT',
+       Uri.parse('$apiUrl/profile/foto'));
+    request.files.add(await http.MultipartFile.fromPath('foto', foto.path));
+    request.headers.addAll(headers);
+    final response = await request.send();
+   if (response.statusCode == 200) {
+      final respStr = await response.stream.bytesToString();
+      final json = jsonDecode(respStr);
+      return json['profile_photo_url'];
+    } else {
+      print('Upload foto gagal: ${response.statusCode}');
+      final respStr = await response.stream.bytesToString();
+      print('Response body: $respStr');
+      return null;
+    }
+
   }
 }

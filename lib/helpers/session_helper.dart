@@ -38,17 +38,20 @@ class SessionHelper {
   }
 
   static Future<Akun?> getUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userJson = prefs.getString(_userKey);
-    if (userJson == null) return null;
+  final prefs = await SharedPreferences.getInstance();
+  final userJson = prefs.getString(_userKey);
+  print('=== GET USER ===');
+  print('userJson: $userJson'); 
+  if (userJson == null) return null;
 
-    try {
-      final map = jsonDecode(userJson);
-      return Akun.fromJson(map);
-    } catch (e) {
-      return null;
-    }
+  try {
+    final map = jsonDecode(userJson);
+    return Akun.fromJson(map);
+  } catch (e) {
+    print('Gagal decode user: $e');
+    return null;
   }
+}
 
   static Future<void> updateUser(Akun akun) async {
     final prefs = await SharedPreferences.getInstance();
@@ -63,9 +66,11 @@ class SessionHelper {
   }
 
   static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
-    await prefs.remove(_staySignedKey);
-    await prefs.remove(_userKey);
-  }
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove(_tokenKey);
+  await prefs.remove(_staySignedKey);
+  await prefs.remove(_userKey);
+  print('=== LOGOUT ===');
+  print('Session dihapus');
+}
 }
