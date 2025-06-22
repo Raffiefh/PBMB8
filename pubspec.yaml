@@ -46,9 +46,14 @@ dependencies:
   flutter_map: ^8.1.1
   latlong2: ^0.9.1
   geolocator: ^14.0.1
+  flutter_map_location_marker: ^10.1.0
+  flutter_map_polyline_points: ^0.5.0
   image_picker: ^1.1.2
   another_flushbar: ^1.10.30
   json_annotation: ^4.8.1
+  webview_flutter: ^4.4.2
+  qr_flutter: ^4.0.0
+  mobile_scanner: ^6.0.10
   mime: ^1.0.4
 dependency_overrides:
   sign_in_with_apple: ^7.0.1

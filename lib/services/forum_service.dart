@@ -13,7 +13,7 @@ class ForumService {
       'akun_id': akunId,
       'username': username,
       'pesan': pesan,
-      'created_at': DateTime.now().toUtc().toIso8601String(),
+      'created_at': DateTime.now().toLocal().toIso8601String(),
     });
   }
 
@@ -25,41 +25,4 @@ class ForumService {
         .limit(100);
   }
 
-  // Future<Map<String, String>> _getHeaders() async {
-  //   final token = await SessionHelper.getToken();
-  //   return {
-  //     'Content-Type': 'application/json',
-  //     if (token != null) 'Authorization': 'Bearer $token',
-  //   };
-  // }
-
-  // Future<List<ForumMessage>> fetchMessages() async {
-  //   final headers = await _getHeaders();
-  //   final response = await http.get(
-  //     Uri.parse('$apiUrl/pesan'),
-  //     headers: headers,
-  //   );
-  //   if (response.statusCode == 200) {
-  //     List jsonData = json.decode(response.body);
-  //     return jsonData.map((e) => ForumMessage.fromJson(e)).toList();
-  //   }
-  //   if (response.statusCode == 403) {
-  //     throw Exception('butuh token jwt');
-  //   } else {
-  //     throw Exception('Gagal memuat pesan forum');
-  //   }
-  // }
-
-  // Future<void> sendMessage(ForumMessage message) async {
-  //   final headers = await _getHeaders();
-  //   final response = await http.post(
-  //     Uri.parse('$apiUrl/pesan'),
-  //     headers: headers,
-  //     body: json.encode(message.toJson()),
-  //   );
-
-  //   if (response.statusCode != 200 && response.statusCode != 201) {
-  //     throw Exception('Gagal mengirim pesan');
-  //   }
-  // }
 }

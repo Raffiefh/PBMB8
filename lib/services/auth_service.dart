@@ -62,7 +62,7 @@ class AuthService {
           return 'Pendaftaran gagal: ${response.body}';
         }
       } else {
-        // Menangani status code HTTP lainnya (misalnya 500 Internal Server Error, 404 Not Found)
+      
         print(
           'Error during registration: ${response.statusCode} - ${response.body}',
         );
@@ -75,9 +75,10 @@ class AuthService {
   }
 
   Future<Map<String, dynamic>?> updateAkun(Akun akun) async {
+    final headers = await _getHeaders();
     final response = await http.put(
-      Uri.parse('$apiUrl/profile/${akun.id}'),
-      headers: {'Content-Type': 'application/json'},
+      Uri.parse('$apiUrl/profile'),
+      headers: headers,
       body: jsonEncode(akun.toJson()),
     );
 
@@ -91,21 +92,24 @@ class AuthService {
     }
   }
   
-  Future<String?> uploadFoto(int id, File foto) async{
+  Future<String?> uploadFoto(File foto) async{
     final headers = await _getHeaders();
     final request = http.MultipartRequest(
       'PUT',
-       Uri.parse('$apiUrl/foto/$id'));
+       Uri.parse('$apiUrl/profile/foto'));
     request.files.add(await http.MultipartFile.fromPath('foto', foto.path));
     request.headers.addAll(headers);
     final response = await request.send();
-    if (response.statusCode == 200) {
+   if (response.statusCode == 200) {
       final respStr = await response.stream.bytesToString();
       final json = jsonDecode(respStr);
-      return json['profil_url'];
+      return json['profile_photo_url'];
     } else {
       print('Upload foto gagal: ${response.statusCode}');
+      final respStr = await response.stream.bytesToString();
+      print('Response body: $respStr');
       return null;
     }
+
   }
 }

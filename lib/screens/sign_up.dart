@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:pbmuas/models/akun.dart';
+import 'package:pbmuas/screens/widgets/flushbar.dart';
 import 'sign_in.dart';
 import 'package:pbmuas/view_models/auth_v_model.dart';
 import 'package:provider/provider.dart';
@@ -23,31 +24,7 @@ class _SignUpState extends State<sign_up> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _noHpController = TextEditingController();
-  void _tampilanPesanSuccess() {
-    Flushbar(
-      messageText: Row(
-        children: const [
-          Icon(Icons.check_circle, color: Colors.white),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              "Registrasi berhasil, silahkan login",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-      backgroundColor: Colors.blueAccent,
-      duration: const Duration(milliseconds: 2500),
-      flushbarPosition: FlushbarPosition.TOP,
-      margin: const EdgeInsets.all(12),
-      borderRadius: BorderRadius.circular(10),
-      animationDuration: const Duration(milliseconds: 3000),
-      forwardAnimationCurve: Curves.easeOutBack,
-      reverseAnimationCurve: Curves.easeIn,
-      flushbarStyle: FlushbarStyle.FLOATING,
-    ).show(context);
-  }
+  
 
   void _register() async {
    
@@ -69,32 +46,10 @@ class _SignUpState extends State<sign_up> {
     setState(() => _isLoading = false);
     if (errorMessage == null) {
       Navigator.pushReplacementNamed(context, '/login');
-      _tampilanPesanSuccess();
+      CustomFlushbar.show(context, message: "Registrasi berhasil, silahkan login", isSuccess: true);
       
     } else {
-      Flushbar(
-        messageText: Row(
-          children: [
-            const Icon(Icons.error_outline, color: Colors.white), // Ganti ikon untuk error
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                errorMessage, // Tampilkan pesan error dari backend
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.redAccent, // Ganti warna untuk error
-        duration: const Duration(milliseconds: 2500),
-        flushbarPosition: FlushbarPosition.TOP,
-        margin: const EdgeInsets.all(12),
-        borderRadius: BorderRadius.circular(10),
-        animationDuration: const Duration(milliseconds: 3000),
-        forwardAnimationCurve: Curves.easeOutBack,
-        reverseAnimationCurve: Curves.easeIn,
-        flushbarStyle: FlushbarStyle.FLOATING,
-      ).show(context);
+      CustomFlushbar.show(context, message: errorMessage, isSuccess: false);
     }
   }
 
@@ -294,8 +249,8 @@ class _SignUpState extends State<sign_up> {
                               if (!RegExp(r'^[0-9]+$').hasMatch(noHp)) {
                                 return "Nomor telepon hanya boleh mengandung angka.";
                               }
-                              if (noHp.length < 9) {
-                                return "Nomor telepon minimal 9 angka";
+                              if (noHp.length < 10) {
+                                return "Nomor telepon minimal 10 angka";
                               }
                               return null;
                             }

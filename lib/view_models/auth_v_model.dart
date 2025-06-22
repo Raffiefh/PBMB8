@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:pbmuas/models/akun.dart';
 import 'package:pbmuas/services/auth_service.dart';
@@ -100,11 +102,22 @@ class AuthVModel extends ChangeNotifier {
 
   try {
     final newToken = result['access_token'];
-    final akunBaru = Akun.fromJson(result);
+    final akunBaru = Akun(
+      id: int.tryParse(result['id'].toString()),
+      username: result['username'],
+      nama: result['nama'],
+      email: result['email'],
+      noHp: result['no_hp'],
+      roleAkunId: int.tryParse(result['role_akun_id'].toString()),
+      profilUrl: result['profile_photo_url'],
+    );
+
 
     _akun = akunBaru;
     await SessionHelper.saveUserSession(newToken, akunBaru, true);
-    
+    print("Nama baru dari server: ${result['nama']}");
+    print("AkunBaru.nama: ${akunBaru.nama}");
+
     _isLoading = false;
     notifyListeners();
     return true;
@@ -115,9 +128,30 @@ class AuthVModel extends ChangeNotifier {
     return false;
   }
 }
+Future<bool> uploadFotoProfil(File foto) async {
+  final url = await _service.uploadFoto(foto);
+  if (url != null) {
+    updateFotoProfil(url);
+    return true;
+  }
+  return false;
+}
 
-   
-
+void updateFotoProfil(String urlBaru) {
+  if (_akun != null) {
+    _akun = Akun(
+      id: _akun!.id,
+      username: _akun!.username,
+      nama: _akun!.nama,
+      email: _akun!.email,
+      noHp: _akun!.noHp,
+      roleAkunId: _akun!.roleAkunId,
+      profilUrl: urlBaru,
+      password: _akun!.password,
+    );
+    notifyListeners();
+  }
+}
 
   int _mapRoleToId(String? role) {
     switch (role) {

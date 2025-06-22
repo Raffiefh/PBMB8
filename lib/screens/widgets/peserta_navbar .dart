@@ -6,18 +6,20 @@ import 'package:pbmuas/screens/peserta/beranda/beranda_screen.dart';
 import 'package:pbmuas/screens/forum/forum_screen.dart';
 import 'package:pbmuas/screens/peserta/tiket/tiket_screen.dart';
 class NavbarPeserta extends StatefulWidget {
-  const NavbarPeserta({super.key});
+  final int initialIndex;
+  const NavbarPeserta({super.key, this.initialIndex = 0});
 
   @override
   State<NavbarPeserta> createState() => _NavbarPesertaState();
 }
 
 class _NavbarPesertaState extends State<NavbarPeserta> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
 
   @override
   void initState() {
     super.initState();
+    _selectedIndex = widget.initialIndex; // <- Ambil index dari parameter
     Future.microtask(() {
       final authVModel = Provider.of<AuthVModel>(context, listen: false);
       authVModel.loadUserFromSession();
@@ -54,22 +56,10 @@ class _NavbarPesertaState extends State<NavbarPeserta> {
         unselectedItemColor: Colors.black,
         showUnselectedLabels: true,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Beranda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.forum),
-            label: 'Forum',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.confirmation_num),
-            label: 'Tiket',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Akun',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
+          BottomNavigationBarItem(icon: Icon(Icons.forum), label: 'Forum'),
+          BottomNavigationBarItem(icon: Icon(Icons.confirmation_num), label: 'Tiket'),
+          BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: 'Akun'),
         ],
       ),
     );

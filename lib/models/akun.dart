@@ -29,7 +29,7 @@ class Akun {
       email: json['email']?.toString() ?? '',
       roleAkunId: int.tryParse(json['role_akun_id'].toString()) ?? 0,
       profilUrl: json['profil_url']?.toString() ?? '',
-      password: json['password']?.toString(), // ini optional
+      password: json['password']?.toString(), 
     );
   }
 
@@ -39,7 +39,7 @@ class Akun {
         'nama': nama,
         'email': email,
         'no_hp': noHp,
-        'role_akun': roleAkunId,
+        'role_akun_id': roleAkunId,
         'profil_url': profilUrl,
         'password': password
       };

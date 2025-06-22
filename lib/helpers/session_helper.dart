@@ -41,7 +41,7 @@ class SessionHelper {
   final prefs = await SharedPreferences.getInstance();
   final userJson = prefs.getString(_userKey);
   print('=== GET USER ===');
-  print('userJson: $userJson'); // Tambahkan log ini
+  print('userJson: $userJson'); 
   if (userJson == null) return null;
 
   try {
