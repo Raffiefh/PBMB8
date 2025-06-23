@@ -65,7 +65,7 @@ class _NavbarPanitiaState extends State<NavbarPanitia> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
-            label: 'Riwayat',
+            label: 'Scan QR',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
