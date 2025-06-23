@@ -64,7 +64,7 @@ class _NavbarPanitiaState extends State<NavbarPanitia> {
             label: 'Forum',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.history),
+            icon: Icon(Icons.qr_code_scanner),
             label: 'Scan QR',
           ),
           BottomNavigationBarItem(
