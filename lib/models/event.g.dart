@@ -22,6 +22,7 @@ Event _$EventFromJson(Map<String, dynamic> json) => Event(
   fotoUrl: json['foto_url'] as String?,
   akunId: (json['akun_id'] as num?)?.toInt(),
   createdAt: json['created_at'] as String?,
+  // totalTiketTerjual: (json['total_tiket_terjual'] as int?)?.toInt(),
 );
 
 Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
@@ -40,4 +41,5 @@ Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
   'foto_url': instance.fotoUrl,
   'akun_id': instance.akunId,
   'created_at': instance.createdAt,
+  // 'total_tiket_terjual': instance.totalTiketTerjual,
 };

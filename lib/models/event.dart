@@ -38,6 +38,14 @@ class Event {
   @JsonKey(name: 'created_at')
   final String? createdAt;
 
+  // @JsonKey(name: 'total_tiket_terjual')
+  // final int? totalTiketTerjual;
+
+  // @JsonKey(name: 'total_pendapatan')
+  // final num? total_Pendapatan;
+
+
+
   Event({
     this.id,
     this.judul,
@@ -54,9 +62,11 @@ class Event {
     this.fotoUrl,
     this.akunId,
     this.createdAt,
+    // this.totalTiketTerjual,
+    // this.total_Pendapatan,
   });
 
+  // factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
-
   Map<String, dynamic> toJson() => _$EventToJson(this);
 }

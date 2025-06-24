@@ -4,6 +4,8 @@ import 'package:pbmuas/screens/panitia/beranda/edit_event_screen.dart';
 import 'package:pbmuas/screens/panitia/beranda/tambah_event_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:pbmuas/view_models/event_v_model.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class BerandaPage extends StatefulWidget {
   const BerandaPage({super.key});
@@ -443,7 +445,7 @@ class _HomePanitiaPageState extends State<BerandaPage> with TickerProviderStateM
                     icon: Icons.visibility_rounded,
                     label: 'Detail',
                     color: const Color(0xFF3B82F6),
-                    onPressed: () => _navigateToDetail(event),
+                    onPressed: () => _navigateToDetail(context,event),
                   ),
                   _buildActionButton(
                     icon: Icons.edit_rounded,
@@ -589,14 +591,338 @@ class _HomePanitiaPageState extends State<BerandaPage> with TickerProviderStateM
     }
   }
 
-  void _navigateToDetail(Event event) {
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => DetailEventScreen(eventId: event.id!),
-    //   ),
-    // );
+Future<Event> fetchEventDetail(int eventId) async {
+  final response = await http.get(
+    Uri.parse('https://api-sound-horeq.vercel.app/api/events/penyelenggara/detail/$eventId'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      // 'Authorization': 'Bearer $token', // Aktifkan jika API pakai token
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final jsonData = jsonDecode(response.body);
+
+    // Cek jika data tidak null
+    if (jsonData['data'] != null) {
+      return Event.fromJson(jsonData['data']);
+    } else {
+      throw Exception('Data kosong atau format tidak valid');
+    }
+  } else {
+    throw Exception('Gagal mengambil detail event: ${response.statusCode}');
   }
+}
+
+
+
+void _loadDetailAndNavigate(BuildContext context, int eventId) async {
+  final navigator = Navigator.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+
+  // Tampilkan loading spinner
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(child: CircularProgressIndicator()),
+  );
+
+  try {
+    final response = await http.get(
+      Uri.parse('https://api-sound-horeq.vercel.app/api/events/penyelenggara/detail/$eventId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      print('==== DATA API ====');
+      print(jsonEncode(jsonData));
+
+      if (jsonData['data'] != null) {
+        final event = Event.fromJson(jsonData['data']);
+        print('==== EVENT PARSED ====');
+        // print('Tiket terjual: ${event.totalTiketTerjual}');
+        // print('Pendapatan: ${event.total_Pendapatan}');
+
+        if (!context.mounted) return;
+        navigator.pop(); // Tutup loading
+        _navigateToDetail(context, event); // Navigasi ke detail
+      } else {
+        navigator.pop();
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Data kosong atau format tidak valid')),
+        );
+      }
+    } else {
+      navigator.pop();
+      messenger.showSnackBar(
+        SnackBar(content: Text('Gagal mengambil detail event: ${response.statusCode}')),
+      );
+    }
+  } catch (e) {
+    if (!context.mounted) return;
+
+    navigator.pop();
+    messenger.showSnackBar(
+      SnackBar(content: Text('Gagal mengambil detail event: $e')),
+    );
+  }
+}
+
+
+  void _navigateToDetail(BuildContext context, Event event) { 
+  final screenWidth = MediaQuery.of(context).size.width;
+  final isTablet = screenWidth > 600;
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => Scaffold(
+        backgroundColor: const Color(0xFFF8FBFF),
+        appBar: AppBar(
+          title: Text(
+            event.judul ?? 'Detail Event',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          backgroundColor: Colors.blue.shade600,
+          iconTheme: const IconThemeData(color: Colors.white),
+          elevation: 0,
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(isTablet ? 24 : 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Gambar Event
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 10,
+                    child: Image.network(
+                      event.fotoUrl ?? '',
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey.shade200,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.image_not_supported_outlined,
+                              size: isTablet ? 64 : 56,
+                              color: Colors.grey.shade400,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Gambar tidak tersedia',
+                              style: TextStyle(
+                                color: Colors.grey.shade500,
+                                fontSize: isTablet ? 16 : 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: isTablet ? 24 : 20),
+
+              // Judul Event
+              Text(
+                event.judul ?? 'Judul Event',
+                style: TextStyle(
+                  fontSize: isTablet ? 28 : 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+
+              SizedBox(height: isTablet ? 16 : 12),
+
+              // Deskripsi Event
+              if (event.deskripsi != null && event.deskripsi!.isNotEmpty)
+                Container(
+                  padding: EdgeInsets.all(isTablet ? 20 : 16),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
+                  ),
+                  child: Text(
+                    event.deskripsi!,
+                    style: TextStyle(
+                      fontSize: isTablet ? 16 : 14,
+                      color: Colors.grey.shade700,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+
+              SizedBox(height: isTablet ? 24 : 20),
+
+              // Informasi Detail Event
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(isTablet ? 20 : 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Detail Event',
+                        style: TextStyle(
+                          fontSize: isTablet ? 20 : 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade800,
+                        ),
+                      ),
+                      SizedBox(height: isTablet ? 16 : 12),
+                      _buildDetailItem(
+                        Icons.calendar_today_outlined,
+                        'Tanggal',
+                        event.tanggalEvent ?? '-',
+                        isTablet,
+                      ),
+                      _buildDetailItem(
+                        Icons.access_time_outlined,
+                        'Waktu',
+                        event.jamMulai ?? '-',
+                        isTablet,
+                      ),
+                      _buildDetailItem(
+                        Icons.location_on_outlined,
+                        'Lokasi',
+                        event.lokasi ?? '-',
+                        isTablet,
+                      ),
+                      _buildDetailItem(
+                        Icons.confirmation_num_outlined,
+                        'Jumlah Tiket',
+                        '${event.jumlahTiket ?? 0}',
+                        isTablet,
+                      ),
+                      _buildDetailItem(
+                        Icons.sell_outlined,
+                        'Tipe Tiket',
+                        _tipeTiketText(event.tipeTiket ?? 0),
+                        isTablet,
+                      ),
+                      _buildDetailItem(
+                        Icons.price_check_outlined,
+                        'Total Pendapatan',
+                        event.hargaTiket != null
+                            ? 'Rp ${event.hargaTiket!.toStringAsFixed(0)}'
+                            : 'Gratis',
+                        isTablet,
+                      ),
+                      // _buildDetailItem(
+                      //   Icons.shopping_cart_checkout_outlined,
+                      //   'Tiket Terjual',
+                      //   '${event.totalTiketTerjual}',
+                      //   isTablet,
+                      // ),
+                      // _buildDetailItem(
+                      //   Icons.attach_money_outlined,
+                      //   'Total Pendapatan',
+                      //   'Rp ${event.total_Pendapatan?.toInt() ?? 0}',
+                      //   isTablet,
+                      // ),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: isTablet ? 24 : 20),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+
+Widget _buildDetailItem(
+  IconData icon,
+  String label,
+  String value,
+  bool isTablet,
+) {
+  return Padding(
+    padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.all(isTablet ? 10 : 8),
+          decoration: BoxDecoration(
+            color: Colors.blue.shade100,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            size: isTablet ? 24 : 20,
+            color: Colors.blue.shade700,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: isTablet ? 15 : 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: isTablet ? 14 : 12,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
   void _navigateToEdit(Event event) {
     Navigator.push(
