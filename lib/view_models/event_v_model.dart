@@ -89,6 +89,7 @@ Future<void> fetcchEventDetail(int id) async {
     }
   }
 
+  //Sepertinya ada yang salah di database, perlu diperbaiki sih
   Future<bool> updateEvent(int id, Map<String, dynamic> data, File? foto) async {
   _setLoading(true);
   try {
